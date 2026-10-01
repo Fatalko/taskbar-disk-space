@@ -1,0 +1,83 @@
+
+int main() {
+    strings={{L"Drive",L"C:"},{L"FreeColor",L"green-red"},{L"DisplayOn",L"primary"},
+             {L"ReserveSpace",L"auto"},{L"LowSpaceMode",L"off"}};
+    integers={{L"UpdateInterval",600},{L"LeftOffset",160},{L"LowSpaceThreshold",10}};
+    LoadSettings();
+    assert(g_settings.drive==L"C:" && g_settings.colorScheme==L"green-red");
+    assert(g_settings.autoCompact && g_settings.precision==1);
+    storage[L"SelectedTheme"]=L"blue-orange";
+    storage[L"SelectedMiniDesign"]=L"1";
+    storage[L"SelectedAppearance"]=L"text";
+    storage[L"SelectedFormat"]=L"used";
+    storage[L"SelectedPrecision"]=L"2";
+    storage[L"SelectedMonitor"]=L"\\\\.\\DISPLAY2";
+    storage[L"SelectedPosition"]=L"right";
+    storage[L"SelectedLowSpace"]=L"gib:20";
+    storage[L"SelectedAutoCompact"]=L"0";
+    integers[L"UpdateInterval"]=800;
+    LoadSettings();
+    assert(g_settings.colorScheme==L"blue-orange" && g_settings.hideDriveName);
+    assert(g_settings.appearance==L"text" && g_settings.format==L"used" && g_settings.precision==2);
+    assert(g_settings.displayOn==L"\\\\.\\DISPLAY2" && g_settings.position==L"right");
+    assert(g_settings.lowSpaceMode==L"gib" && g_settings.lowSpaceThreshold==20 && !g_settings.autoCompact);
+    strings[L"FreeColor"]=L"cyan-purple";
+    strings[L"DisplayOn"]=L"all";
+    strings[L"ReserveSpace"]=L"left";
+    integers[L"LowSpaceThreshold"]=50;
+    LoadSettings();
+    assert(g_settings.colorScheme==L"cyan-purple" && g_settings.displayOn==L"all");
+    assert(g_settings.position==L"left" && g_settings.lowSpaceMode==L"off" && g_settings.lowSpaceThreshold==50);
+    ResetAppearance(); LoadSettings();
+    assert(g_settings.colorScheme==L"green-red" && g_settings.appearance==L"bar");
+    assert(g_settings.format==L"free" && g_settings.precision==1 && !g_settings.hideDriveName && g_settings.autoCompact);
+    assert(g_settings.displayOn==L"all" && g_settings.position==L"left" && g_settings.drive==L"C:");
+    ApplyConfiguredSettings();
+    assert(g_settings.colorScheme==L"cyan-purple" && g_settings.format==L"free");
+    assert(g_settings.displayOn==L"all" && g_settings.position==L"left");
+    storage[L"SelectedLowSpace"]=L"percent:9999999"; LoadSettings();
+    assert(g_settings.lowSpaceThreshold==100);
+    storage[L"SelectedLowSpace"]=L"gib:bad"; LoadSettings();
+    assert(g_settings.lowSpaceMode==L"off" && g_settings.lowSpaceThreshold==50);
+
+    assert(LowSpaceReached(10,100,L"percent",10));
+    assert(!LowSpaceReached(11,100,L"percent",10));
+    assert(!LowSpaceReached(0,0,L"percent",100));
+    assert(!LowSpaceReached(0,100,L"off",100));
+    assert(LowSpaceReached(10ULL<<30,100ULL<<30,L"gib",10));
+    assert(!LowSpaceReached((10ULL<<30)+1,100ULL<<30,L"gib",10));
+    assert(!LowSpaceReached(101,100,L"percent",100));
+    assert(FormatGiB(1.256,true,2)==L"1,26");
+    assert(FormatGiB(1.256,true,1)==L"1,3");
+    assert(FormatGiB(1.6,true,0)==L"2");
+    assert(FormatGiB(0.0,true,2)==L"0,00");
+    assert(CapacityText(25ULL<<30,100ULL<<30,true,true,L"used",0)==L"75 / 100 ГиБ");
+    assert(CapacityText(25ULL<<30,100ULL<<30,true,true,L"percent",2)==L"25,00 %");
+    assert(CapacityText(110ULL<<30,100ULL<<30,true,true,L"used",0)==L"0 / 100 ГиБ");
+    assert(ShouldUseCompact(false,true,300,160,200));
+    assert(!ShouldUseCompact(false,true,150,160,200));
+    assert(!ShouldUseCompact(false,true,200,300,100));
+    assert(!ShouldUseCompact(false,false,300,160,200));
+    assert(ShouldUseCompact(true,false,100,300,200));
+    ButtonBounds centered{600,1100,true};
+    assert(AvailableIndicatorWidth(1920,160,220,false,false,centered)==428);
+    assert(AvailableIndicatorWidth(1920,220,220,true,false,centered)==588);
+    ButtonBounds left{200,700,true}, shifted{400,900,true}, full{20,1900,true};
+    assert(AvailableIndicatorWidth(1920,160,220,false,true,left)==
+           AvailableIndicatorWidth(1920,160,220,false,true,shifted));
+    assert(AvailableIndicatorWidth(1920,220,220,true,false,full)==0);
+    TaskbarWindow primary{nullptr,1,L"\\\\.\\DISPLAY1",true}, secondary{nullptr,2,L"\\\\.\\DISPLAY2",false};
+    Settings choice;
+    assert(IsSelectedTaskbar(choice,primary) && !IsSelectedTaskbar(choice,secondary));
+    choice.displayOn=L"all";
+    assert(IsSelectedTaskbar(choice,primary) && IsSelectedTaskbar(choice,secondary));
+    choice.displayOn=L"\\\\.\\display2";
+    assert(!IsSelectedTaskbar(choice,primary) && IsSelectedTaskbar(choice,secondary));
+    choice.displayOn=L"disconnected";
+    assert(!IsSelectedTaskbar(choice,primary) && !IsSelectedTaskbar(choice,secondary));
+    UiState a,b;
+    { UiScope outer(&a); assert(g_activeUi==&a);
+      {UiScope inner(&b); assert(g_activeUi==&b);} assert(g_activeUi==&a); }
+    assert(g_activeUi==nullptr);
+    std::cout << "Settings, thresholds, formats, compact layout, placement and monitor routing passed.\n";
+}

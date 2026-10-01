@@ -1,0 +1,35 @@
+name: Bug report / Ошибка
+description: Report a reproducible problem / Сообщить о проблеме
+title: "[Bug] "
+body:
+  - type: input
+    id: versions
+    attributes:
+      label: Versions / Версии
+      description: Mod version, Windhawk version, Windows build (winver).
+    validations:
+      required: true
+  - type: textarea
+    id: setup
+    attributes:
+      label: Taskbar and displays / Панель и мониторы
+      description: Taskbar position, scale, monitors, auto-hide, one/all drives, other taskbar mods.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to reproduce / Как повторить
+    validations:
+      required: true
+  - type: textarea
+    id: behavior
+    attributes:
+      label: Expected and actual behavior / Ожидаемый и фактический результат
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Screenshots and relevant logs / Скриншоты и логи
+      description: Optional. For layout problems, include relevant [Taskbar layout] lines. Remove private information before posting.
