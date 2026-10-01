@@ -1,5 +1,68 @@
 # Taskbar Disk Space
 
+[English version](#english-version)
+
+**Версия 0.12.36** · Мод [Windhawk](https://windhawk.net/) для штатной панели задач Windows 11.
+
+Показывает место на дисках прямо на панели задач, позволяет выбирать диски и менять оформление через меню. Здесь публикуются последние авторские версии независимо от официального каталога. [Заявка в официальный каталог](https://github.com/ramensoftware/windhawk-mods/pull/5818).
+
+## Возможности
+
+- Один выбранный диск или все фиксированные локальные диски, метки томов и собственное имя.
+- Свободно / Всего, Занято / Всего или процент свободного места; 0–2 знака после запятой.
+- Системная тема, цветная полоса и только текст; десять палитр и анимации наведения/нажатия.
+- Ручной и автоматический мини-дизайн, отдельные предупреждения о нехватке места для каждого диска.
+- Основная, все или выбранная панель; сохранение монитора по пути устройства, если Windows его предоставляет.
+- Выбор положения на горизонтальной панели. Экспериментальная поддержка вертикальных панелей слева/справа: автоматическое размещение сверху и прокрутка длинного списка дисков в пределах свободного участка.
+- Меню выбора дисков, оформления, обновления данных и сброса; команды открытия диска, «Этот компьютер» и «Управление дисками».
+
+## Скриншоты
+
+![Taskbar Disk Space — скриншот 1](https://i.imgur.com/QsiHo0m.png)
+![Taskbar Disk Space — скриншот 2](https://i.imgur.com/VyaAfGR.png)
+![Taskbar Disk Space — скриншот 3](https://i.imgur.com/fHFa648.png)
+![Taskbar Disk Space — скриншот 4](https://i.imgur.com/zqPRJ9V.png)
+![Taskbar Disk Space — скриншот 5](https://i.imgur.com/7Zs15Sq.png)
+
+## Установка и обновление
+
+1. Установите Windhawk и скачайте [taskbar-disk-space.wh.cpp](taskbar-disk-space.wh.cpp) через **Raw / Download raw file** на GitHub.
+2. Создайте новый мод в Windhawk, замените его исходник полным содержимым скачанного файла и скомпилируйте.
+3. Для обновления существующей локальной установки откройте её исходный код, замените содержимое новым файлом и снова скомпилируйте.
+4. Перед включением отключите другую установку Taskbar Disk Space; оставьте одну активную копию.
+
+Версии из этого репозитория обновляются вручную. Автоматические обновления в Windhawk этим репозиторием не настраиваются. Установки из официального каталога получают опубликованную там версию. Подробное описание управления и ограничений находится также внутри мода.
+
+## Совместимость
+
+Windows 11 22H2 и новее со штатной панелью задач, x86-64. Настройки совместимы с Windhawk 1.7.3 и 2.0; динамические списки требуют 2.0. Вертикальная панель поддерживается экспериментально и требует конфигурации Windows, в которой доступны эти положения. ExplorerPatcher и StartAllBack не поддерживаются.
+
+Перечисляются только фиксированные локальные диски. Читаются сведения о томах, пользовательские файлы не изменяются. ГиБ — 1024³ байт. Внутреннее устройство панели Windows может измениться после обновлений.
+
+## Обратная связь
+
+[Сообщить об ошибке](https://github.com/Fatalko/taskbar-disk-space/issues/new?template=bug_report.yml) · [Предложить функцию](https://github.com/Fatalko/taskbar-disk-space/issues/new?template=feature_request.yml)
+
+Укажите версии мода, Windhawk и Windows, положение панели, мониторы, масштаб и шаги воспроизведения. Для проблем размещения временно включите диагностику в настройках мода и журнал отладки Windhawk; приложите нужные строки `[Taskbar layout]`. Перед публичной отправкой проверьте логи и скриншоты. Обратная связь добровольная; мод не отправляет отчёты автоматически.
+
+## Разработка
+
+Запустите `./test.ps1` в PowerShell с установленным Windhawk по стандартному пути либо передайте `-WindhawkPath`. Проверки собирают и запускают тесты извлечённой логики исходника, затем компилируют весь мод. Они не заменяют проверку в Explorer. Результаты сборки исключены из репозитория.
+
+[История разработки](CHANGELOG.md) включает локальные версии, которые не публиковались в официальном каталоге.
+
+## Лицензия и авторство
+
+[GPL-3.0](LICENSE). Поиск XAML панели адаптирован из [Taskbar Multirow](https://github.com/ramensoftware/windhawk-mods/blob/main/mods/taskbar-multirow.wh.cpp) Michael Maltsev и [Taskbar System Info](https://github.com/ramensoftware/windhawk-mods/blob/main/mods/taskbar-system-info.wh.cpp) Yevhenii Starychenko. Авторские ссылки сохранены в исходнике.
+
+Разработчик — Fatalko, с помощью ИИ (ChatGPT / Codex).
+
+---
+
+## English version
+
+[Русская версия](#taskbar-disk-space)
+
 **Version 0.12.36** · A [Windhawk](https://windhawk.net/) mod for the native Windows 11 taskbar.
 
 Shows disk capacity directly on the taskbar, with drive selection and appearance controls. This repository hosts the author's latest versions independently of the official catalog. [Official catalog submission](https://github.com/ramensoftware/windhawk-mods/pull/5818).
@@ -16,11 +79,7 @@ Shows disk capacity directly on the taskbar, with drive selection and appearance
 
 ## Screenshots
 
-![Taskbar Disk Space screenshot 1](https://i.imgur.com/QsiHo0m.png)
-![Taskbar Disk Space screenshot 2](https://i.imgur.com/VyaAfGR.png)
-![Taskbar Disk Space screenshot 3](https://i.imgur.com/fHFa648.png)
-![Taskbar Disk Space screenshot 4](https://i.imgur.com/zqPRJ9V.png)
-![Taskbar Disk Space screenshot 5](https://i.imgur.com/7Zs15Sq.png)
+[View screenshots](#скриншоты).
 
 ## Install / update
 
@@ -48,16 +107,6 @@ Include the mod/Windhawk/Windows versions, taskbar position, monitor setup, scal
 Run `./test.ps1` in PowerShell with Windhawk installed in its default directory, or pass `-WindhawkPath`. The checks compile extracted production logic into a native regression harness, execute it and compile the full mod. They do not replace testing in Explorer. Build output is excluded from this repository.
 
 [Development history](CHANGELOG.md) includes local versions that were not released in the official catalog.
-
-## Русский
-
-Мод показывает место на одном или всех локальных дисках на панели задач Windows 11. Доступны темы, точность, проценты, мини-дизайн, выбор монитора и предупреждение о нехватке места. На вертикальной панели размещается автоматически сверху; длинный список дисков прокручивается колёсиком.
-
-**Установка:** скачайте полный файл [taskbar-disk-space.wh.cpp](taskbar-disk-space.wh.cpp), создайте мод в Windhawk, вставьте исходник и скомпилируйте. Для обновления замените исходник уже установленного локального мода. Другую копию мода отключите.
-
-Это репозиторий последних авторских версий. Обновления отсюда устанавливаются вручную; публикация в официальном каталоге проходит отдельно.
-
-[Сообщить об ошибке](https://github.com/Fatalko/taskbar-disk-space/issues/new?template=bug_report.yml) · [Предложить функцию](https://github.com/Fatalko/taskbar-disk-space/issues/new?template=feature_request.yml) · [История изменений](CHANGELOG.md)
 
 ## License and credits
 
