@@ -1,22 +1,86 @@
 # Taskbar Disk Space — история изменений
 
-Локальная история разработки. Эти записи не означают публикацию версий в официальном каталоге.
+**Последняя версия: 0.12.38 · 2 октября 2026**
 
-## 0.12.38 — 2026-10-02
+В этом обновлении — отдельные значки внутренних и внешних дисков и три режима отображения: все диски, только локальные или только внешние.
+
+[Исходник мода](taskbar-disk-space.wh.cpp) · [Установка и описание](README.md) · [Обратная связь](https://github.com/Fatalko/taskbar-disk-space/issues)
+
+> История авторских версий. Запись здесь не означает публикацию в официальном каталоге Windhawk.
+
+## Навигация
+
+- [0.12.38 — значки и группы дисков](#version-0-12-38)
+- [0.12.37 — подключение USB-накопителей](#version-0-12-37)
+- [0.12.36 — размещение на вертикальной панели](#version-0-12-36)
+- [Архив — 0.12.35 и более ранние версии](#version-archive)
+
+---
+
+<a id="version-0-12-38"></a>
+
+## 0.12.38
+
+**Дата:** 2026-10-02
+
+### Добавлено
 
 - Добавлены разные значки внутренних и внешних дисков в меню левой кнопки и сохраняемые режимы «Все диски», «Все локальные диски», «Все внешние диски». USB-диски определяются по свойствам устройства в рабочем потоке; меню использует кеш.
+
+<details>
+<summary>English</summary>
+
 - Added distinct local/external icons and persistent All drives, All local drives and All external drives groups. USB disks are classified from device properties on the worker; menus use cached results.
 
-## 0.12.37 — 2026-10-02
+</details>
+
+---
+
+<a id="version-0-12-37"></a>
+
+## 0.12.37
+
+**Дата:** 2026-10-02
+
+### Добавлено
 
 - Добавлена поддержка USB-флешек и внешних дисков с назначенной буквой; подключение и отключение проверяются каждые две секунды. В режиме всех дисков список обновляется автоматически, одиночный режим сохраняет выбор.
+
+<details>
+<summary>English</summary>
+
 - Added removable USB drives and external disks with drive letters, with automatic connection/removal detection every two seconds. All-drive mode updates automatically; single-drive selection is preserved.
 
-## 0.12.36 — 2026-10-01
+</details>
+
+---
+
+<a id="version-0-12-36"></a>
+
+## 0.12.36
+
+**Дата:** 2026-10-01
+
+### Изменено
 
 - На вертикальных панелях оставлено только автоматическое размещение сверху; меню показывает единственный отмеченный вариант.
 - Сохранён выбор положения для горизонтальной панели; возврат вниз/вверх его восстанавливает.
+
+<details>
+<summary>English</summary>
+
 - Vertical taskbars now use only automatic top placement; horizontal position preferences are preserved.
+
+</details>
+
+---
+
+<a id="version-archive"></a>
+
+## Архив версий
+
+<details>
+<summary>Открыть историю 0.12.35 и более ранних версий / Older versions</summary>
 
 ## 0.12.35 — 2026-10-01
 
@@ -384,3 +448,5 @@ the maximum is 3600 seconds. Disk polling performs no writes to the drive.
 
 Комментарии для новой логики сохранены на русском и английском языках.
 Comments for the new logic are kept in both Russian and English.
+
+</details>
