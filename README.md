@@ -2,13 +2,14 @@
 
 [English version](#english-version)
 
-**Версия 0.12.36** · Мод [Windhawk](https://windhawk.net/) для штатной панели задач Windows 11.
+**Версия 0.12.38** · Мод [Windhawk](https://windhawk.net/) для штатной панели задач Windows 11.
 
 Показывает место на дисках прямо на панели задач, позволяет выбирать диски и менять оформление через меню. Здесь публикуются последние авторские версии независимо от официального каталога. [Заявка в официальный каталог](https://github.com/ramensoftware/windhawk-mods/pull/5818).
 
 ## Возможности
 
-- Один выбранный диск или все фиксированные локальные диски, метки томов и собственное имя.
+- Один выбранный диск или группы «Все диски», «Все локальные диски», «Все внешние диски», метки томов и собственное имя.
+- USB-флешки и внешние диски появляются и исчезают автоматически; изменения букв дисков проверяются каждые две секунды. В меню внутренних и внешних дисков используются разные значки, выбранная группа сохраняется.
 - Свободно / Всего, Занято / Всего или процент свободного места; 0–2 знака после запятой.
 - Системная тема, цветная полоса и только текст; десять палитр и анимации наведения/нажатия.
 - Ручной и автоматический мини-дизайн, отдельные предупреждения о нехватке места для каждого диска.
@@ -37,7 +38,7 @@
 
 Windows 11 22H2 и новее со штатной панелью задач, x86-64. Настройки совместимы с Windhawk 1.7.3 и 2.0; динамические списки требуют 2.0. Вертикальная панель поддерживается экспериментально и требует конфигурации Windows, в которой доступны эти положения. ExplorerPatcher и StartAllBack не поддерживаются.
 
-Перечисляются только фиксированные локальные диски. Читаются сведения о томах, пользовательские файлы не изменяются. ГиБ — 1024³ байт. Внутреннее устройство панели Windows может измениться после обновлений.
+Перечисляются локальные диски, USB-флешки и внешние накопители с назначенной буквой. Сетевые диски и устройства без буквы исключены. Съёмные носители и диски, сообщающие USB/IEEE 1394 или съёмный носитель в свойствах Windows, относятся к внешним; если свойства фиксированного диска недоступны, он остаётся в локальной группе. Читаются сведения о томах, пользовательские файлы не изменяются. ГиБ — 1024³ байт. Внутреннее устройство панели Windows может измениться после обновлений.
 
 ## Обратная связь
 
@@ -63,13 +64,14 @@ Windows 11 22H2 и новее со штатной панелью задач, x86
 
 [Русская версия](#taskbar-disk-space)
 
-**Version 0.12.36** · A [Windhawk](https://windhawk.net/) mod for the native Windows 11 taskbar.
+**Version 0.12.38** · A [Windhawk](https://windhawk.net/) mod for the native Windows 11 taskbar.
 
 Shows disk capacity directly on the taskbar, with drive selection and appearance controls. This repository hosts the author's latest versions independently of the official catalog. [Official catalog submission](https://github.com/ramensoftware/windhawk-mods/pull/5818).
 
 ## Features
 
-- One selected drive or all local fixed drives, with volume names and custom labels.
+- One selected drive or All drives, All local drives and All external drives groups, with volume names and custom labels.
+- Automatic USB flash drive and external disk connection/removal detection, checked every two seconds for drive-letter changes. Local and external drives use different menu icons; the selected group is saved.
 - Free / Total, Used / Total, or free-space percentage; 0–2 decimal places.
 - System, Color bar and Text only themes; ten palettes and animated hover/pressed states.
 - Manual and automatic compact layouts, plus per-drive low-space highlighting.
@@ -94,7 +96,7 @@ Updates published here are installed manually. This repository does not configur
 
 Windows 11 22H2+ with the native taskbar, x86-64. Windhawk 1.7.3 and 2.0-compatible settings; dynamic settings lists require 2.0. Vertical taskbar support is experimental and requires a Windows configuration providing those positions. ExplorerPatcher and StartAllBack are unsupported.
 
-Only fixed local drives are listed. Reads use volume metadata, without modifying user files. GiB means 1024³ bytes. Windows taskbar internals can change after updates.
+Local disks, USB flash drives and external disks with drive letters are listed; network drives and devices without drive letters are excluded. Removable media and disks reporting USB/IEEE 1394 or removable media in Windows storage properties belong to the external group; a fixed disk whose properties cannot be queried stays in the local group. Reads use volume metadata, without modifying user files. GiB means 1024³ bytes. Windows taskbar internals can change after updates.
 
 ## Feedback
 

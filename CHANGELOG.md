@@ -2,6 +2,16 @@
 
 Локальная история разработки. Эти записи не означают публикацию версий в официальном каталоге.
 
+## 0.12.38 — 2026-10-02
+
+- Добавлены разные значки внутренних и внешних дисков в меню левой кнопки и сохраняемые режимы «Все диски», «Все локальные диски», «Все внешние диски». USB-диски определяются по свойствам устройства в рабочем потоке; меню использует кеш.
+- Added distinct local/external icons and persistent All drives, All local drives and All external drives groups. USB disks are classified from device properties on the worker; menus use cached results.
+
+## 0.12.37 — 2026-10-02
+
+- Добавлена поддержка USB-флешек и внешних дисков с назначенной буквой; подключение и отключение проверяются каждые две секунды. В режиме всех дисков список обновляется автоматически, одиночный режим сохраняет выбор.
+- Added removable USB drives and external disks with drive letters, with automatic connection/removal detection every two seconds. All-drive mode updates automatically; single-drive selection is preserved.
+
 ## 0.12.36 — 2026-10-01
 
 - На вертикальных панелях оставлено только автоматическое размещение сверху; меню показывает единственный отмеченный вариант.

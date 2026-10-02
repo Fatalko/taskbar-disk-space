@@ -3,7 +3,7 @@
 // @name            Taskbar Disk Space
 // @description     Disk space on the Windows 11 taskbar with drive selection, color themes and system shortcuts.
 // @description:ru-RU Место на диске на панели задач Windows 11: выбор диска, цветовые темы и системные команды.
-// @version         0.12.36
+// @version         0.12.38
 // @author          Fatalko
 // @github          https://github.com/Fatalko
 // @license         GPL-3.0
@@ -27,7 +27,7 @@ Display the selected local drive's label, free space and total capacity on the
 Windows 11 taskbar. Show two lines with a drive name, or one compact line with
 the name hidden.
 
-- **Left-click:** choose a local fixed drive.
+- **Left-click:** choose a local drive.
 - **Right-click → Theme:** choose System (neutral hover), Color bar (default), or Text only (no hover background). Selection persists.
 - **Right-click → Position:** choose Automatic, Left or Right. The choice applies immediately and persists; changing position in settings overrides the menu choice.
 - **Right-click → Monitor:** immediately select the primary taskbar, all taskbars or a detected display. Selection persists; changing the monitor setting overrides the menu choice.
@@ -44,7 +44,7 @@ the name hidden.
 - **Right-click → Disk Management:** open the system console with administrator elevation.
 - **Right-click → Refresh now:** reread disk space without waiting for the refresh interval.
 
-Menus use cached drive and monitor lists collected by the worker (drives every 30 seconds, monitors on taskbar topology changes detected every five seconds, with a 60-second fallback). Reopen the menu after a device change to see the refreshed list.
+Menus use cached drive and monitor lists collected by the worker (drive connections/removals every two seconds with a full refresh every 30 seconds, monitors on taskbar topology changes detected every five seconds, with a 60-second fallback). Reopen the menu after a device change to see the refreshed list.
 
 Drive and theme selections persist across Explorer restarts. Changing the initial
 drive or color scheme in Windhawk settings overrides the corresponding menu choice.
@@ -59,7 +59,7 @@ Monitor selection for display is a single dropdown offering Primary taskbar, All
 Refresh defaults to 10 minutes. Placement options are Automatic (configurable left
 offset), Left (15 DIPs), and Right (before the system tray). Requires Windhawk 1.7.3
 or 2.0 and the native bottom taskbar on Windows 11 22H2+. ExplorerPatcher and
-StartAllBack are unsupported. Only fixed local drives are listed; capacity checks
+StartAllBack are unsupported. Local and removable drives are listed; capacity checks
 read volume metadata without writing user data.
 
 
@@ -72,10 +72,14 @@ Single-drive and all-drive modes support a narrow stacked layout on left/right t
 Enable **Taskbar layout diagnostics** temporarily and start Windhawk debug logging. Move the taskbar to each edge and collect lines beginning with `[Taskbar layout]`. They report window geometry, XAML discovery and available width without changing placement. Vertical taskbar support is experimental.
 
 ## All local drives
+The left-click menu offers All drives, All local drives and All external drives, with a saved group selection and distinct icons. External drives include removable media and devices reporting USB/IEEE 1394 or removable media through Windows storage properties. If a fixed drive cannot be queried, it remains in the local group.
 
-Enable **Show all local fixed drives** in settings or **All local drives** in either taskbar menu. Each fixed local volume has its own column, warning color and free/used strip in Color bar mode. Format, precision, themes and Mini design apply to all columns. Selecting a particular drive returns to single-drive mode; turning the all-drive option off restores the previous selected drive.
+USB flash drives and external disks are detected automatically within approximately two seconds after Windows assigns or removes a drive letter. In all-drive mode they appear or disappear automatically; single-drive mode keeps the selected drive. Network drives and devices without drive letters are excluded.
 
-Volumes appear in drive-letter order. Custom names apply only to the configured drive. The inventory refreshes every 30 seconds; capacity uses the configured interval and Refresh now. On limited space, automatic Mini design is tried, individual text is ellipsized, and the block is hidden when even minimal columns cannot fit. No aggregate capacity is shown. Network and removable drives remain excluded.
+
+Enable **Show all drives** in settings or **All drives** in either taskbar menu. Each local volume has its own column, warning color and free/used strip in Color bar mode. Format, precision, themes and Mini design apply to all columns. Selecting a particular drive returns to single-drive mode; turning the all-drive option off restores the previous selected drive.
+
+Volumes appear in drive-letter order. Custom names apply only to the configured drive. Drive-letter changes are detected every two seconds, with a full inventory refresh every 30 seconds; capacity uses the configured interval and Refresh now. On limited space, automatic Mini design is tried, individual text is ellipsized, and the block is hidden when even minimal columns cannot fit. No aggregate capacity is shown. Network drives remain excluded; removable USB drives are supported.
 
 ## Screenshots
 
@@ -135,7 +139,7 @@ Both this mod and taskbar-disk-space-label display free space and total capacity
 Можно использовать метку тома или задать своё имя. Недоступный диск помечается
 соответствующим сообщением. ГиБ — единицы по 1024³ байт.
 
-Меню используют кеш рабочего потока: диски обновляются раз в 30 секунд, мониторы — при изменении панелей (проверка раз в пять секунд), с контрольным обновлением раз в минуту. После изменения устройств переоткройте меню, когда список обновится.
+Меню используют кеш рабочего потока: подключение и отключение дисков проверяется каждые две секунды с полным обновлением раз в 30 секунд, мониторы — при изменении панелей (проверка раз в пять секунд), с контрольным обновлением раз в минуту. После изменения устройств переоткройте меню, когда список обновится.
 
 ## Вертикальная панель — экспериментально
 
@@ -146,16 +150,20 @@ Both this mod and taskbar-disk-space-label display free space and total capacity
 Временно включите **«Диагностика положения панели»** и журнал отладки Windhawk. Переместите панель вниз, вверх, влево и вправо; сохраните строки `[Taskbar layout]`. Они показывают размеры, обнаружение XAML и доступную ширину, не изменяя размещение. Поддержка вертикальной панели экспериментальная.
 
 ## Все локальные диски
+В меню левой кнопки доступны «Все диски», «Все локальные диски» и «Все внешние диски». Выбранная группа сохраняется. Локальные диски и внешние устройства имеют разные значки. Внешними считаются съёмные носители и диски, для которых Windows сообщает USB/IEEE 1394 или съёмный носитель; если запрос свойств фиксированного диска недоступен, он остаётся в локальной группе.
 
-Включите **«Показывать все локальные диски»** в настройках или **«Все локальные диски»** в меню левой или правой кнопки. Диски показаны колонками в порядке букв. Для каждого отдельно отображаются объём, предупреждение о нехватке места и тонкая полоса свободного/занятого места в теме «Цветная полоса». Формат, точность, тема и мини-дизайн общие.
+USB-флешки и внешние диски определяются автоматически примерно за две секунды после назначения или удаления буквы диска Windows. В режиме всех дисков они появляются и исчезают автоматически; одиночный режим сохраняет выбранный диск. Сетевые диски и устройства без буквы не отображаются.
 
-Выбор конкретного диска возвращает одиночный режим. Отключение режима возвращает прежний выбранный диск. Собственное имя применяется только к начальному диску. Состав дисков обновляется раз в 30 секунд; объём — по заданному интервалу и через «Обновить сейчас». При недостатке места используется автоматический мини-дизайн, текст сокращается; если минимальные колонки не помещаются, блок скрывается. Общий объём дисков не суммируется. Сетевые и съёмные диски исключены.
+
+Включите **«Показывать все диски»** в настройках или **«Все диски»** в меню левой или правой кнопки. Диски показаны колонками в порядке букв. Для каждого отдельно отображаются объём, предупреждение о нехватке места и тонкая полоса свободного/занятого места в теме «Цветная полоса». Формат, точность, тема и мини-дизайн общие.
+
+Выбор конкретного диска возвращает одиночный режим. Отключение режима возвращает прежний выбранный диск. Собственное имя применяется только к начальному диску. Изменения букв дисков проверяются каждые две секунды, полный список обновляется раз в 30 секунд; объём — по заданному интервалу и через «Обновить сейчас». При недостатке места используется автоматический мини-дизайн, текст сокращается; если минимальные колонки не помещаются, блок скрывается. Общий объём дисков не суммируется. USB-флешки и внешние диски включены; сетевые диски исключены.
 
 ## Управление с панели задач
 
 | Действие | Результат |
 |---|---|
-| Левая кнопка мыши | Список доступных фиксированных локальных дисков |
+| Левая кнопка мыши | Список доступных локальных и съёмных дисков |
 | Правая кнопка → **Тема** | Системная, Цветная полоса или Только текст |
 | Правая кнопка → **Цвета** | Десять палитр для темы «Цветная полоса» |
 | Правая кнопка → **Положение** | Автоматически, Слева или Справа; выбор применяется сразу и сохраняется |
@@ -243,8 +251,7 @@ Windhawk **1.7.3 и 2.0**, штатная нижняя горизонтальн�
 В Windhawk 2.0 список дисков в настройках дополнительно показывает метки томов.
 Меню индикатора показывает метки томов в обеих версиях.
 
-В меню доступны только фиксированные локальные диски. Сетевые ресурсы и съёмные
-флеш-накопители не перечисляются. Проверка ёмкости читает сведения о томе через
+В меню доступны локальные диски, USB-флешки и внешние диски. Сетевые ресурсы не перечисляются. Проверка ёмкости читает сведения о томе через
 `GetDiskFreeSpaceExW` и не записывает пользовательские данные на диск.
 
 */
@@ -258,10 +265,10 @@ Windhawk **1.7.3 и 2.0**, штатная нижняя горизонтальн�
   $description: Enable temporarily with Windhawk debug logging to investigate taskbar placement. Does not change layout.
   $description:ru-RU: Временно включите вместе с журналом отладки Windhawk для проверки положения панели. Не меняет разметку.
 - ShowAllDrives: false
-  $name: Show all local fixed drives
-  $name:ru-RU: Показывать все локальные диски
-  $description: Show each local fixed drive in a separate column. Network and removable drives are excluded.
-  $description:ru-RU: Каждый фиксированный локальный диск отображается отдельной колонкой. Сетевые и съёмные диски исключены.
+  $name: Show all drives
+  $name:ru-RU: Показывать все диски
+  $description: Show each local drive in a separate column. USB flash drives and external disks are included; network drives are excluded.
+  $description:ru-RU: Каждый локальный или съёмный диск отображается отдельной колонкой. USB-флешки и внешние диски включены; сетевые диски исключены.
 - Drive: "C:"
   $name: Drive
   $name:ru-RU: Диск
@@ -425,6 +432,7 @@ Windhawk **1.7.3 и 2.0**, штатная нижняя горизонтальн�
 #include <windhawk_api.h>
 #include <windhawk_utils.h>
 #include <shellapi.h>
+#include <winioctl.h>
 #include <algorithm>
 #include <array>
 #include <atomic>
@@ -461,6 +469,7 @@ constexpr wchar_t kWidgetName[] = L"WindhawkTaskbarDiskSpace";
 struct Settings {
     bool layoutDiagnostics = false;
     bool showAllDrives = false;
+    std::wstring driveGroup = L"all";
     bool autoCompact = true;
     int precision = 1;
     std::wstring displayOn = L"primary";
@@ -669,10 +678,14 @@ void LoadSettings() {
     if (LocalStringValue(L"ConfiguredAllDrives") != configuredAll ||
         (selectedAll != L"0" && selectedAll != L"1")) {
         selectedAll = configuredAll;
+        Wh_DeleteValue(L"SelectedDriveGroup");
         Wh_SetStringValue(L"ConfiguredAllDrives", configuredAll);
         Wh_SetStringValue(L"SelectedAllDrives", selectedAll.c_str());
     }
     settings.showAllDrives = selectedAll == L"1";
+    settings.driveGroup = LocalStringValue(L"SelectedDriveGroup");
+    if (settings.driveGroup != L"local" && settings.driveGroup != L"external")
+        settings.driveGroup = L"all";
     const std::wstring configuredDrive = NormalizeDrive(StringSetting(L"Drive"));
     const std::wstring previousConfigured =
         NormalizeDrive(LocalStringValue(kConfiguredDriveValue));
@@ -859,7 +872,8 @@ Reading ReadDisk(const Settings& settings, bool russian) {
                 UiText(russian, L"Invalid drive letter", L"Некорректная буква диска")};
     }
     std::wstring root = settings.drive + L"\\";
-    const bool fixed = GetDriveTypeW(root.c_str()) == DRIVE_FIXED;
+    const UINT driveType = GetDriveTypeW(root.c_str());
+    const bool fixed = driveType == DRIVE_FIXED || driveType == DRIVE_REMOVABLE;
     std::wstring title;
     if (settings.hideDriveName) {
         // Только буква диска / Drive letter only.
@@ -898,7 +912,7 @@ Reading ReadDisk(const Settings& settings, bool russian) {
     return result;
 }
 
-struct DriveOption { std::wstring drive; std::wstring label; };
+struct DriveOption { std::wstring drive; std::wstring label; bool external = false; };
 struct MonitorOption {
     std::wstring device;
     std::wstring label;
@@ -932,6 +946,8 @@ Reading ReadDrives(const Settings& settings, bool russian) {
     if (!settings.showAllDrives) return ReadDisk(settings, russian);
     Reading result;
     for (const auto& option : CachedDrives()) {
+        if ((settings.driveGroup == L"local" && option.external) ||
+            (settings.driveGroup == L"external" && !option.external)) continue;
         Settings diskSettings = settings;
         diskSettings.drive = option.drive;
         auto disk = ReadDisk(diskSettings, russian);
@@ -940,17 +956,19 @@ Reading ReadDrives(const Settings& settings, bool russian) {
         result.drives.push_back(std::move(disk));
     }
     if (result.drives.empty()) {
-        result.title = UiText(russian, L"No local fixed drives", L"Нет локальных дисков");
+        result.title = UiText(russian, L"No matching drives", L"Нет дисков выбранной группы");
         result.capacity = UiText(russian, L"Drive unavailable", L"Диск недоступен");
     }
     return result;
 }
 
-void SetAllDrives(bool enabled) {
+void SetAllDrives(bool enabled, const std::wstring& group = L"all") {
+    Wh_SetStringValue(L"SelectedDriveGroup", group.c_str());
     Wh_SetStringValue(L"SelectedAllDrives", enabled ? L"1" : L"0");
     {
         std::lock_guard lock(g_settingsMutex);
         g_settings.showAllDrives = enabled;
+        g_settings.driveGroup = group;
     }
     if (g_changed) SetEvent(g_changed);
 }
@@ -979,21 +997,25 @@ void ShowDriveMenu() {
     const auto drives = CachedDrives();
     const Settings settings = CurrentSettings();
     MenuFlyout menu;
-    ToggleMenuFlyoutItem all;
-    all.Text(UiText(russian, L"All local drives", L"Все локальные диски"));
-    all.Icon(MenuIcon(L"\uE8B7"));
-    all.IsChecked(settings.showAllDrives);
-    all.Click([enabled = !settings.showAllDrives](auto const&, auto const&) {
-        SetAllDrives(enabled);
-    });
-    menu.Items().Append(all);
+    for (const auto* group : {L"all", L"local", L"external"}) {
+        ToggleMenuFlyoutItem item;
+        const std::wstring selection = group;
+        const bool external = selection == L"external";
+        item.Text(selection == L"all" ? UiText(russian, L"All drives", L"Все диски") :
+            external ? UiText(russian, L"All external drives", L"Все внешние диски") :
+            UiText(russian, L"All local drives", L"Все локальные диски"));
+        item.Icon(MenuIcon(external ? L"\uE88E" : L"\uEDA2"));
+        item.IsChecked(settings.showAllDrives && settings.driveGroup == selection);
+        item.Click([selection](auto const&, auto const&) { SetAllDrives(true, selection); });
+        menu.Items().Append(item);
+    }
     menu.Items().Append(MenuFlyoutSeparator());
     for (const auto& option : drives) {
         const auto& drive = option.drive;
         MenuFlyoutItem item;
-        item.Icon(MenuIcon(L"\uE8B7"));
+        item.Icon(MenuIcon(option.external ? L"\uE88E" : L"\uEDA2"));
         std::wstring label = option.label;
-        if (label.empty()) label = UiText(russian, L"Local Disk", L"Локальный диск");
+        if (label.empty()) label = option.external ? UiText(russian, L"External drive", L"Внешний диск") : UiText(russian, L"Local Disk", L"Локальный диск");
         std::wstring text = (!settings.showAllDrives && drive == settings.drive ? L"✓ " : L"  ") +
                             label + L" (" + drive + L")";
         item.Text(text);
@@ -1006,7 +1028,7 @@ void ShowDriveMenu() {
     if (drives.empty()) {
         MenuFlyoutItem item;
         item.Icon(MenuIcon(L"\uE8B7"));
-        item.Text(UiText(russian, L"No local fixed drives available",
+        item.Text(UiText(russian, L"No local drives available",
                          L"Нет доступных локальных дисков"));
         item.IsEnabled(false);
         menu.Items().Append(item);
@@ -1124,7 +1146,7 @@ void ApplyConfiguredSettings() {
     constexpr PCWSTR values[] = {
         L"SelectedDrive", L"SelectedTheme", L"SelectedMiniDesign", L"SelectedAppearance",
         L"SelectedFormat", L"SelectedPrecision", L"SelectedMonitor", L"SelectedPosition",
-        L"SelectedLowSpace", L"SelectedAutoCompact", L"SelectedAllDrives"
+        L"SelectedLowSpace", L"SelectedAutoCompact", L"SelectedAllDrives", L"SelectedDriveGroup"
     };
     for (const auto value : values) Wh_DeleteValue(value);
     LoadSettings();
@@ -1151,10 +1173,10 @@ void ShowThemeMenu() {
     MenuFlyout menu;
     MenuFlyoutSubItem themeMenu;
     ToggleMenuFlyoutItem allDrives;
-    allDrives.Text(UiText(russian, L"All local drives", L"Все локальные диски"));
+    allDrives.Text(UiText(russian, L"All drives", L"Все диски"));
     allDrives.Icon(MenuIcon(L"\uE8B7"));
-    allDrives.IsChecked(settings.showAllDrives);
-    allDrives.Click([enabled = !settings.showAllDrives](auto const&, auto const&) {
+    allDrives.IsChecked(settings.showAllDrives && settings.driveGroup == L"all");
+    allDrives.Click([enabled = !(settings.showAllDrives && settings.driveGroup == L"all")](auto const&, auto const&) {
         SetAllDrives(enabled);
     });
     menu.Items().Append(allDrives);
@@ -1595,6 +1617,26 @@ void ApplyHoverBackground() {
     g_ui.hoverAnimation.Begin();
 }
 
+// Called only by the worker: menus use the cached classification.
+bool IsExternalDrive(const std::wstring& drive, UINT driveType) {
+    if (driveType == DRIVE_REMOVABLE) return true;
+    const std::wstring device = L"\\\\.\\" + drive;
+    HANDLE handle = CreateFileW(device.c_str(), 0, FILE_SHARE_READ | FILE_SHARE_WRITE,
+                                nullptr, OPEN_EXISTING, 0, nullptr);
+    if (handle == INVALID_HANDLE_VALUE) return false;
+    STORAGE_PROPERTY_QUERY query{};
+    query.PropertyId = StorageDeviceProperty;
+    query.QueryType = PropertyStandardQuery;
+    STORAGE_DEVICE_DESCRIPTOR descriptor{};
+    DWORD returned = 0;
+    const bool queried = DeviceIoControl(handle, IOCTL_STORAGE_QUERY_PROPERTY,
+        &query, sizeof(query), &descriptor, sizeof(descriptor), &returned, nullptr) != FALSE;
+    CloseHandle(handle);
+    return queried && returned >= offsetof(STORAGE_DEVICE_DESCRIPTOR, RawPropertiesLength) &&
+        (descriptor.BusType == BusTypeUsb || descriptor.BusType == BusType1394 ||
+         descriptor.RemovableMedia);
+}
+
 void PublishDrives(std::array<std::optional<std::wstring>, 26>& published,
                   bool russian) {
     DWORD mask = GetLogicalDrives();
@@ -1605,9 +1647,10 @@ void PublishDrives(std::array<std::optional<std::wstring>, 26>& published,
         std::wstring key = L"::wh_select_option::Drive::" + drive;
         std::wstring root = drive + L"\\";
         std::wstring label;
-        if ((mask & (1u << i)) && GetDriveTypeW(root.c_str()) == DRIVE_FIXED) {
+        const UINT driveType = (mask & (1u << i)) ? GetDriveTypeW(root.c_str()) : DRIVE_UNKNOWN;
+        if (driveType == DRIVE_FIXED || driveType == DRIVE_REMOVABLE) {
             label = VolumeName(root);
-            drives.push_back({drive, label});
+            drives.push_back({drive, label, IsExternalDrive(drive, driveType)});
             if (label.empty()) label = UiText(russian, L"Local Disk", L"Локальный диск");
             label += L" (" + drive + L")";
         }
@@ -2511,7 +2554,8 @@ DWORD WINAPI Worker(void*) {
     std::vector<TaskbarWindow> knownWindows;
     constexpr ULONGLONG uiProbeInterval = 5000;
     ULONGLONG nextRead = 0, nextEnumeration = 0, nextUiProbe = 0;
-    ULONGLONG nextMonitorCheck = 0;
+    ULONGLONG nextMonitorCheck = 0, nextDriveCheck = 0;
+    DWORD lastDriveMask = 0;
     Reading reading;
     bool uiDirty = true;
     std::array<std::optional<std::wstring>, 26> published;
@@ -2520,6 +2564,16 @@ DWORD WINAPI Worker(void*) {
         while (WaitForSingleObject(g_stop, 0) != WAIT_OBJECT_0) {
             const auto settings = CurrentSettings();
             const auto now = GetTickCount64();
+            if (now >= nextDriveCheck) {
+                const DWORD mask = GetLogicalDrives();
+                if (mask && mask != lastDriveMask) {
+                    lastDriveMask = mask;
+                    nextEnumeration = 0;
+                    nextRead = 0;
+                    uiDirty = true;
+                }
+                nextDriveCheck = now + 2000;
+            }
             if (now >= nextEnumeration) {
                 const auto previous = CachedDrives();
                 PublishDrives(published, IsRussianUi());
@@ -2527,7 +2581,7 @@ DWORD WINAPI Worker(void*) {
                 if (settings.showAllDrives && (previous.size() != current.size() ||
                     !std::equal(previous.begin(), previous.end(), current.begin(),
                         [](const auto& a, const auto& b) {
-                            return a.drive == b.drive && a.label == b.label;
+                            return a.drive == b.drive && a.label == b.label && a.external == b.external;
                         }))) nextRead = 0;
                 nextEnumeration = now + 30000;
             }
@@ -2595,7 +2649,7 @@ DWORD WINAPI Worker(void*) {
                 }
                 uiDirty = !allUpdated;
             }
-            const auto nextDue = std::min(nextRead, std::min(nextEnumeration, nextUiProbe));
+            const auto nextDue = std::min(nextDriveCheck, std::min(nextRead, std::min(nextEnumeration, nextUiProbe)));
             const DWORD timeout = nextDue > now ?
                 static_cast<DWORD>(std::min<ULONGLONG>(5000, nextDue - now)) : 0;
             const DWORD wait = WaitForMultipleObjects(ARRAYSIZE(events), events, FALSE, timeout);
