@@ -13,6 +13,8 @@ $harness = @'
 #include <windows.h>
 #include <algorithm>
 #include <array>
+#include <vector>
+#include <cmath>
 #include <cassert>
 #include <cstdio>
 #include <limits>
@@ -42,8 +44,10 @@ foreach ($pattern in @(
     '(?s)std::wstring CapacityText\(.*?\r?\n\}',
     '(?s)bool LowSpaceReached\(.*?\r?\n\}',
     '(?s)bool ShouldUseCompact\(.*?\r?\n\}',
+    '(?s)struct Reading .*?(?=struct DriveCell)',
     '(?s)struct ButtonBounds \{.*?\r?\n\};',
     '(?s)double AvailableIndicatorWidth\(.*?\r?\n\}',
+    '(?s)struct LayoutGap .*?(?=void CollectHorizontalButtons)',
     '(?s)struct TaskbarWindow \{.*?\r?\n\};',
     '(?s)bool IsSelectedTaskbar\(.*?\r?\n\}',
     '(?s)void ResetAppearance\(\).*?\r?\n\}',

@@ -1,8 +1,8 @@
 # Taskbar Disk Space — история изменений
 
-**Последняя версия: 0.12.38 · 2 октября 2026**
+**Последняя версия: 0.14.0 · 6 октября 2026**
 
-В этом обновлении — отдельные значки внутренних и внешних дисков и три режима отображения: все диски, только локальные или только внешние.
+В этом обновлении — отдельная тема «Фон свободного места» для списка дисков без нижней полосы.
 
 [Исходник мода](taskbar-disk-space.wh.cpp) · [Установка и описание](README.md) · [Обратная связь](https://github.com/Fatalko/taskbar-disk-space/issues)
 
@@ -10,10 +10,117 @@
 
 ## Навигация
 
+- [0.14.0 — тема с фоновым отображением места](#version-0-14-0)
+- [0.13.0 — фон дисков и кнопка списка](#version-0-13-0)
+
+- [0.12.40 — исправление измерения ширины](#version-0-12-40)
+
+- [0.12.39 — адаптивное размещение и меню](#version-0-12-39)
+
 - [0.12.38 — значки и группы дисков](#version-0-12-38)
 - [0.12.37 — подключение USB-накопителей](#version-0-12-37)
 - [0.12.36 — размещение на вертикальной панели](#version-0-12-36)
 - [Архив — 0.12.35 и более ранние версии](#version-archive)
+
+---
+
+<a id="version-0-14-0"></a>
+
+## 0.14.0
+
+**Дата:** 2026-10-06
+
+### Добавлено
+
+- «Тема → Фон свободного места»: свободное и занятое место постоянно отображаются фоном каждого диска списка, без нижней полосы. При наведении фон плавно становится ярче.
+- Подменю «Цвета» доступно в новой теме; выбор темы сохраняется. Высококонтрастный режим отключает цветовой фон, отключённые анимации Windows учитываются. Плитки букв сохраняют собственный фон.
+
+<details>
+<summary>English</summary>
+
+- Added Theme → Capacity background: each drive in the list has a persistent free/used background instead of a bottom strip, which brightens smoothly on hover.
+- Colors are available for the new persistent theme selection. High contrast disables the capacity background, Windows animation preferences are respected, and letter tiles retain their own background.
+
+</details>
+
+---
+
+<a id="version-0-13-0"></a>
+
+## 0.13.0
+
+**Дата:** 2026-10-06
+
+### Добавлено
+
+- В теме «Цветная полоса» каждый диск списка получает фон свободного/занятого места при наведении с плавным переходом; учитываются высококонтрастная тема и отключение анимаций Windows.
+- Подсказка кнопки «Диски · N» показывает информацию о дисках выбранной группы в текущем формате и точности, без дополнительных запросов к дискам.
+- «Мини дизайн → Диски · N» позволяет включить кнопку списка вручную, в том числе на вертикальной панели; выбор сохраняется и сбрасывается существующими командами оформления.
+
+### Изменено
+
+- Для новых наборов изменений принято правило MAJOR.MINOR.PATCH: исправления повышают PATCH, новые функции — MINOR, несовместимые изменения — MAJOR. Исторические версии сохранены.
+
+<details>
+<summary>English</summary>
+
+- Added animated per-drive free/used hover backgrounds in Color bar appearance, respecting high contrast and Windows animation preferences.
+- Drives · N has a native tooltip containing the selected group's capacity readings in the current format and precision, without extra disk queries.
+- Added a persistent manual Drives · N option under Mini design, including vertical taskbars; existing appearance reset commands clear it.
+- Adopted MAJOR.MINOR.PATCH numbering for new changes; historical versions are unchanged.
+
+</details>
+
+---
+
+<a id="version-0-12-40"></a>
+
+## 0.12.40
+
+**Дата:** 2026-10-06
+
+### Исправлено
+
+- Прежний отступ индикатора больше не входит в измерение содержимого: перед Measure обнуляется Margin. Исправлен рост измеренной ширины при размещении справа, ошибочно включавший кнопку «Диски · N» даже на свободной панели.
+- Поиск справа учитывает свободные промежутки между отдельными группами кнопок, а не только участок после самой правой кнопки; добавлены регрессионные проверки таких промежутков и отсутствия перекрытий.
+
+<details>
+<summary>English</summary>
+
+- Reset the previous placement Margin before measuring intrinsic content width. Fixed growing width estimates and unnecessary Drives · N fallback on otherwise spacious taskbars.
+- Find free gaps between separated right-side button groups instead of considering only the section after the last button; added gap and overlap regression coverage.
+
+</details>
+
+---
+
+<a id="version-0-12-39"></a>
+
+## 0.12.39
+
+**Дата:** 2026-10-06
+
+### Добавлено
+
+- Измерение реальных размеров полного, компактного, плиточного вида и кнопки списка; автоматический выбор свободного участка слева/справа с учётом штатных кнопок, виджета и трея.
+- «Буквы дисков и полоса» в мини-дизайне: постоянный фон свободного/занятого места; резервная кнопка «Диски · N» при нехватке места.
+- Расширенные логи свободных участков, DPI, ширины всех вариантов и причины выбора; регрессионные сценарии 1080p/1440p, масштабы 100/125/150%, тесная панель и резервные виды.
+- Средняя кнопка на пункте диска открывает Проводник без смены выбранной группы; подсказка объясняет действие.
+
+### Изменено
+
+- Группы меню переименованы в «Автоматический режим», «Локальные диски» и «Внешние диски»; автоматический режим получил отдельный значок.
+- Убран фиксированный минимум ширины на диск при горизонтальном размещении; левый отступ автоматического режима ограничивается реальным свободным участком.
+
+<details>
+<summary>English</summary>
+
+- Added measured full/compact/tile/list-button views and automatic left/right placement around native buttons, Widgets and the tray.
+- Added persistent drive-letter capacity tiles, a Drives · N fallback, detailed layout diagnostics and geometry tests for 1080p/1440p and 100/125/150% scaling.
+- Middle-click opens a drive in Explorer without changing the group; drive menu tooltips explain the shortcut.
+- Renamed groups to Automatic mode, Local drives and External drives, with a distinct automatic icon. Removed the fixed horizontal minimum per drive and constrained the preferred offset to the safe gap.
+
+</details>
 
 ---
 
