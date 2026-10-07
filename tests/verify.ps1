@@ -39,7 +39,10 @@ $harness += "`n" + (Extract '(?s)struct Settings \{.*?\r?\n\};')
 $harness += "Settings g_settings; std::mutex g_settingsMutex;`n"
 foreach ($pattern in @(
     '(?s)std::wstring NormalizeDrive\(.*?\r?\n\}',
+    '(?s)DWORD ParseManualDrives\(.*?(?=void LoadSettings)',
     '(?s)void LoadSettings\(\).*?\r?\n\}',
+    '(?s)void SetAllDrives\(.*?\r?\n\}',
+    '(?s)void SetManualDrive\(.*?\r?\n\}',
     '(?s)std::wstring FormatGiB\(.*?\r?\n\}',
     '(?s)std::wstring CapacityText\(.*?\r?\n\}',
     '(?s)bool LowSpaceReached\(.*?\r?\n\}',
