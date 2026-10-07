@@ -2,22 +2,24 @@
 
 [English version](#english-version)
 
-**Версия 0.14.0** · Мод [Windhawk](https://windhawk.net/) для штатной панели задач Windows 11.
+**Версия 0.17.4** · Мод [Windhawk](https://windhawk.net/) для штатной панели задач Windows 11.
 
 Показывает место на дисках прямо на панели задач, позволяет выбирать диски и менять оформление через меню. Здесь публикуются последние авторские версии независимо от официального каталога. [Заявка в официальный каталог](https://github.com/ramensoftware/windhawk-mods/pull/5818).
 
 ## Возможности
 
-- Один выбранный диск или группы «Автоматический режим» (все диски), «Локальные диски», «Внешние диски», метки томов и собственное имя.
-- USB-флешки и внешние диски появляются и исчезают автоматически; изменения букв дисков проверяются каждые две секунды. В меню внутренних и внешних дисков используются разные значки, выбранная группа сохраняется.
-- Свободно / Всего, Занято / Всего или процент свободного места; 0–2 знака после запятой.
-- Системная тема, цветная полоса, фон свободного места и только текст; десять палитр и анимации наведения/нажатия. Новая тема показывает свободное и занятое место фоном каждого диска списка без нижней полосы; при наведении фон становится ярче.
-- Адаптивное размещение по реально свободным участкам панели: обычный вид, мини-дизайн, плитки с буквой диска и кнопка «Диски · N». Мини-дизайн можно выбрать вручную; подсказка кнопки списка показывает место на дисках выбранной группы в текущем формате и точности.
+- Один выбранный диск, группы «Автоматический режим» (все диски), «Локальные диски», «Внешние диски» или ручной набор через «Выбранные диски» в обоих меню. Отметки сохраняются после перезапуска Explorer; «Показывать выбранные диски» возвращает набор после смены группы.
+- USB-флешки и внешние диски появляются и исчезают автоматически; изменения букв проверяются каждые две секунды. В ручном наборе новые неотмеченные устройства не добавляются. Отключённые выбранные буквы сохраняются и возвращаются при подключении; пустой набор показывает «Диски не выбраны».
+- Свободно / Всего, Занято / Всего или процент свободного места; 0–2 знака после запятой, метки томов и собственное имя.
+- На горизонтальной панели отображается столько целых карточек выбранного вида, сколько помещается, с кнопкой «Ещё · N» для скрытых дисков. При наведении она показывает их данные, при нажатии открывает полное меню выбора. Порядок — по буквам дисков.
+- Автоматическое положение выбирает сторону, где помещается больше карточек; при равенстве центральные значки предпочитают левый участок после виджета, левое выравнивание — правый перед треем. Можно выбрать сторону вручную. Геометрия проверяется не реже раза в пять секунд; запас при возврате карточек уменьшает мигание.
+- «Компактный режим → Автоматически» всегда включён и недоступен для переключения. Если ни одна карточка с «Ещё» не помещается, адаптация пробует компактный текст, плитки букв и «Диски · N». Скрытие имени, плитки и кнопку списка можно выбрать вручную; подсказка кнопки показывает сведения о текущем наборе.
+- Системная тема, цветная полоса, фон свободного места и только текст; десять палитр. В списке нет общей рамки: системная тема и цветная полоса подсвечивают только диск под курсором. Постоянный фон свободного/занятого места не меняется при наведении; поверх него и плиток появляется лёгкая нейтральная подсветка с анимацией 120 мс. Рамки учитывают высоту, скругление и прозрачность кнопки «Пуск».
 - Отдельные предупреждения о нехватке места для каждого диска. Высококонтрастное оформление и отключённые анимации Windows учитываются.
 - Основная, все или выбранная панель; сохранение монитора по пути устройства, если Windows его предоставляет.
-- Выбор положения на горизонтальной панели. Экспериментальная поддержка вертикальных панелей слева/справа: автоматическое размещение сверху и прокрутка длинного списка дисков в пределах свободного участка.
-- Меню выбора дисков, оформления, обновления данных и сброса; команды открытия диска, «Этот компьютер» и «Управление дисками».
-- Средняя кнопка мыши на диске в открытом меню выбора открывает этот диск в Проводнике; при наведении пункт показывает подсказку.
+- Экспериментальная поддержка вертикальных панелей слева/справа: автоматическое размещение сверху и прокрутка длинного списка в пределах свободного участка.
+- Меню оформления, обновления данных и сброса; команды открытия диска, «Этот компьютер» и «Управление дисками». Все пункты и варианты меню имеют короткие пояснения при наведении на русском или английском.
+- Средняя кнопка мыши на подключённом диске в меню открывает его в Проводнике без изменения выбора. «Сбросить оформление» сохраняет ручной набор, «Применить настройки Windhawk» очищает отметки и параметры меню. Набор хранит буквы: другой том с той же буквой будет отображаться вместо прежнего.
 
 ## Скриншоты
 
@@ -66,22 +68,24 @@ Windows 11 22H2 и новее со штатной панелью задач, x86
 
 [Русская версия](#taskbar-disk-space)
 
-**Version 0.14.0** · A [Windhawk](https://windhawk.net/) mod for the native Windows 11 taskbar.
+**Version 0.17.4** · A [Windhawk](https://windhawk.net/) mod for the native Windows 11 taskbar.
 
 Shows disk capacity directly on the taskbar, with drive selection and appearance controls. This repository hosts the author's latest versions independently of the official catalog. [Official catalog submission](https://github.com/ramensoftware/windhawk-mods/pull/5818).
 
 ## Features
 
-- One selected drive or Automatic mode (all drives), Local drives and External drives groups, with volume names and custom labels.
-- Automatic USB flash drive and external disk connection/removal detection, checked every two seconds for drive-letter changes. Local and external drives use different menu icons; the selected group is saved.
-- Free / Total, Used / Total, or free-space percentage; 0–2 decimal places.
-- System, Color bar, Capacity background and Text only themes; ten palettes and animated hover/pressed states. The new theme fills each drive in the list with its free/used proportions instead of a bottom strip; hovering brightens the fill.
-- Adaptive placement within actual free taskbar gaps: normal, compact, letter tiles and a Drives · N button. Compact layouts can be selected manually; the list button's tooltip shows capacity for the selected group using the current format and precision.
+- One selected drive, Automatic mode (all drives), Local drives, External drives, or a manual set using Selected drives in either menu. Checks survive Explorer restarts; Show selected drives restores the set after changing groups.
+- USB flash drive and external disk connection/removal detection checks drive-letter changes every two seconds. New unchecked devices are excluded from a manual set. Disconnected selected letters remain saved and return when reconnected; an empty set shows No drives selected.
+- Free / Total, Used / Total, or free-space percentage; 0–2 decimal places, volume names and custom labels.
+- Horizontal taskbars show as many complete cards of the selected layout as fit, reserving a More · N button for hidden drives. Hover shows their capacity details; clicking opens the complete selection menu. Drives are ordered by letter.
+- Automatic placement chooses the side fitting more cards. Ties prefer the left gap after Widgets for centered icons, or the right gap before the tray for left-aligned icons. Manual side selection remains available. Layout is checked at least every five seconds; extra space is required before restoring a card to reduce flicker.
+- Compact mode → Automatic is always enabled, checked and unavailable for toggling. If no card plus More fits, adaptation tries compact text, drive-letter tiles and Drives · N. Hide drive name, tiles and the list button can be selected manually; the list tooltip shows the current set's capacity.
+- System, Color bar, Capacity background and Text only themes; ten palettes. Lists have no shared frame: System and Color bar highlight only the hovered drive. Capacity backgrounds keep their free/used fill unchanged; a subtle neutral overlay fades in/out over these cards and tiles in 120 ms. Frames follow the Start button's height, corner radius and translucent opacity.
 - Per-drive low-space highlighting. High contrast and Windows animation preferences are respected.
 - Primary, all or a selected taskbar; monitor device paths used when available.
-- Horizontal placement controls. Experimental left/right vertical taskbars use automatic top placement; all-drive lists scroll within the available space.
-- Menus for drives, appearance, refresh, reset and system shortcuts: selected drive, This PC and Disk Management.
-- Middle-click a drive in the open drive menu to open it in File Explorer; menu items show a hover hint.
+- Experimental left/right vertical taskbars use automatic top placement; long lists scroll within the available space.
+- Appearance, refresh and reset menus with shortcuts to the selected drive, This PC and Disk Management. All menu commands and options have short Russian or English hover hints.
+- Middle-click a connected drive in a menu to open it in File Explorer without changing its selection. Reset appearance preserves the manual set; Apply Windhawk settings clears its checks and menu overrides. Sets store letters: a different volume receiving the same letter will be displayed instead.
 
 ## Screenshots
 

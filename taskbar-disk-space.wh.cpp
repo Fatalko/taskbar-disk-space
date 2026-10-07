@@ -3,7 +3,7 @@
 // @name            Taskbar Disk Space
 // @description     Disk space on the Windows 11 taskbar with drive selection, color themes and system shortcuts.
 // @description:ru-RU Место на диске на панели задач Windows 11: выбор диска, цветовые темы и системные команды.
-// @version         0.14.0
+// @version         0.17.4
 // @author          Fatalko
 // @github          https://github.com/Fatalko
 // @license         GPL-3.0
@@ -28,18 +28,18 @@ Windows 11 taskbar. Show two lines with a drive name, or one compact line with
 the name hidden.
 
 - **Left-click:** choose a local drive.
-- **Right-click → Theme:** choose System (neutral hover), Color bar (default), Capacity background, or Text only (no hover background). Capacity background fills each drive in the list with its free/used proportions, with no bottom strip; hover brightens the fill. Selection persists.
+- **Right-click → Theme:** choose System (neutral hover), Color bar (default), Capacity background, or Text only (no hover background). Capacity background fills each drive in the list with its free/used proportions, with no bottom strip; its opacity follows the native Start frame. Selection persists.
   High contrast disables the list's capacity background; letter tiles retain their own appearance. Windows animation preferences are respected.
 - **Right-click → Position:** choose Automatic, Left or Right. The choice applies immediately and persists; changing position in settings overrides the menu choice.
 - **Right-click → Monitor:** immediately select the primary taskbar, all taskbars or a detected display. Selection persists; changing the monitor setting overrides the menu choice.
-- **Mini design → Automatic mini design:** enabled by default; tries the compact layout when it is narrower and the normal layout does not fit. Manual Mini design takes priority.
+- **Compact mode → Automatic:** always enabled, checked and unavailable for switching; a previously saved disabled value is migrated to enabled; in list mode, compact further only when no card fits in the selected design. Single-drive mode keeps its full/compact/tiles fallback. Manual Compact mode takes priority.
 - **Low disk space:** choose Disabled, 5/10/15/20 %, or 5/10/20/50 GiB; custom thresholds remain available in settings.
 - **Reset appearance:** restore Color bar, green/red, Free / Total, one decimal place, normal layout and automatic compact mode; keep drive, monitor, position and warning threshold.
 - **Apply Windhawk settings:** discard menu overrides and apply the settings page; menu-only parameters return to defaults. Menu selections do not rewrite settings-page fields; menu checkmarks show effective values.
 - **Right-click → Precision:** choose 0, 1 (default) or 2 decimal places for GiB and percentages. Values are rounded; selection persists.
-- **Right-click → Format:** choose Free / Total, Used / Total, or Free, %. The selection persists and works with Mini design. Used space is total minus space available to the current user, including quotas.
-- **Right-click → Colors:** select one of ten palettes for Color bar or Capacity background; disabled in the other themes. Mini design works with every theme.
-- **Right-click → Mini design → Hide drive name:** toggle the compact single-line layout with the drive name hidden. The choice persists; changing Hide drive name in settings overrides it.
+- **Right-click → Format:** choose Free / Total, Used / Total, or Free, %. The selection persists and works with Compact mode. Used space is total minus space available to the current user, including quotas.
+- **Right-click → Colors:** select one of ten palettes for Color bar or Capacity background. In other themes the dimmed submenu can be opened for explanations, but color selections have no effect. Compact mode works with every theme.
+- **Right-click → Compact mode → Hide drive name:** toggle the compact single-line layout with the drive name hidden. The choice persists; changing Hide drive name in settings overrides it.
 - **Right-click → Open selected drive:** open the current drive in File Explorer.
 - **Right-click → This PC:** open File Explorer at This PC.
 - **Right-click → Disk Management:** open the system console with administrator elevation.
@@ -49,11 +49,11 @@ Menus use cached drive and monitor lists collected by the worker (drive connecti
 
 Drive and theme selections persist across Explorer restarts. Changing the initial
 drive or color scheme in Windhawk settings overrides the corresponding menu choice.
-The hover surface follows the Start button background height and corner radius;
-width follows the text and space available between native buttons and the tray. A 12-DIP gap is kept; a measured list button is tried before hiding the indicator. Placement is rechecked at least every five seconds. Hover and pressed transitions respect
-Windows animation settings. No tooltip is shown.
+In single-drive mode, the hover surface follows the Start button background height and corner radius;
+width follows the text and space available between native buttons and the tray. A 12-DIP gap is kept; a measured list button is tried before hiding the indicator. Placement is rechecked at least every five seconds. Drive-list cards and More use the native frame height and corner radius; text is centered inside each card. Neutral and capacity backgrounds share the effective alpha of a translucent native Start brush, including brush opacity; if unavailable, a system brush or a 16/255 (about 6%) fallback is used. Vertical cards use this height as a minimum so stacked text can grow. Hover and pressed transitions respect
+Windows animation settings. Capacity tooltips are available on the list and overflow buttons.
 
-Low disk space warning settings offer Disabled (default), Percent, or GiB, with an integer threshold (default 10). At or below the threshold, text turns red in every appearance mode, including Mini design. Refresh now also checks the threshold. High-contrast text colors are preserved; zero or unavailable capacity does not trigger the warning.
+Low disk space warning settings offer Disabled (default), Percent, or GiB, with an integer threshold (default 10). At or below the threshold, text turns red in every appearance mode, including Compact mode. Refresh now also checks the threshold. High-contrast text colors are preserved; zero or unavailable capacity does not trigger the warning.
 
 Monitor selection for display is a single dropdown offering Primary taskbar, All taskbars and automatically detected displays with model names when available, falling back to device labels. Resolution is not shown. Taskbar topology is checked every five seconds; display options refresh on topology changes and at least once per minute; reopen the dropdown after a connection change. Windows must show a taskbar on the selected display. A disconnected selection is retained. Monitor choices use the Windows monitor device path when available, mapped to the current DISPLAY name; if Windows cannot supply a path, the GDI name remains the fallback. Menus and hover states remain independent. Windhawk 1.7.3 uses a text field (`primary`, `all`, or a device name such as `\\.\DISPLAY2`) because dynamic lists require Windhawk 2.0.
 
@@ -73,25 +73,35 @@ Enable **Taskbar layout diagnostics** temporarily and start Windhawk debug loggi
 
 ## Automatic placement and compact views
 
-On horizontal taskbars, the mod measures its contents and free sections between visible buttons, Widgets and the tray. Centered icons prefer the left section after Widgets; left-aligned icons prefer the right section before the tray. If the full view fits only on the other side, Automatic position uses that side. Manual side selection is preserved.
+On horizontal taskbars, the mod measures each drive card and the free sections between visible buttons, Widgets and the tray in XAML logical units. In list mode, Automatic position chooses the side that fits more whole cards in the selected design; equal counts prefer the left section after Widgets for centered icons, or the right section before the tray for left-aligned icons. Manual side selection is preserved.
 
-When space is limited, Automatic mini design tries compact text, then drive-letter tiles with a persistent free/used background bar. Mini design → Letters and capacity bar also enables tiles manually. High contrast disables the background and preserves system text colors. If the entire list cannot fit, a Drives · N button keeps the menu accessible. The indicator is hidden temporarily only if even that button cannot fit or native taskbar geometry is unavailable. Placement is rechecked at least every five seconds.
+In list mode, show the largest fitting prefix in drive-letter order and reserve space for a More · N button containing the hidden count. Preserve the selected normal, compact or letter-tile design. Hover More for a passive capacity card of the hidden drives; left-click opens the complete drive menu. The selected group and full drive snapshot remain intact. For example, eight drives may appear as C:, D:, E: and More · 5. Capacity readings, warnings, palettes and formats remain individual to each drive.
 
-In list mode, hovering an individual drive animates its free/used background in Color bar appearance. Mini design → Drives · N manually enables the list button, taking priority over letter tiles and hidden names. Its tooltip lists capacity for each drive in the selected group using the current format and precision. The manual list button is also available on vertical taskbars.
+If no whole card plus More fits, Automatic may try compact text and then letter tiles; it no longer reduces an entire list when some cards already fit in the selected view. If no card fits, use Drives · N; hide only when even that button cannot fit or native geometry is unavailable. Manual Drives · N always takes priority. Placement is checked at least every five seconds; shrinking is immediate on the next check, while restoring a card requires eight spare DIPs to reduce flicker near a width threshold. Single-drive and vertical-list behavior is unchanged. High contrast preserves system colors and disables capacity backgrounds.
 
-Opt-in `[Taskbar layout]` logs include DPI, both free sections, measured widths of all four views, chosen side and mode (0 full, 1 compact, 2 tiles, 3 list button, -1 no room).
+In drive-list mode, the overall container stays transparent. System and Color bar appearances highlight only the hovered drive with a neutral background; Color bar keeps its bottom free/used strip without adding a capacity fill on hover. Capacity background retains its persistent fill and adds a subtle neutral highlight over the hovered card; letter tiles receive the same highlight. The highlight fades in and out over 120 ms, respects Windows animation preferences and leaves the capacity fill opacity unchanged. Text only retains no hover background. Compact mode → Drives · N manually enables the list button, taking priority over letter tiles and hidden names. Its tooltip is a rounded card with the group name, drive count and individual drive panels: letter, name, capacity in the current format and precision, free-space percentage and a free/used bar in the selected palette. Names and capacity wrap to up to two lines. The passive card lays out long lists in columns within the monitor work area; if they cannot all fit, it reports the remaining count. Light, dark and high-contrast Windows themes are supported. The manual list button is also available on vertical taskbars.
 
-The left-click groups are Automatic mode, Local drives and External drives. Automatic mode here displays all detected drives; taskbar positioning is a separate setting. Middle-clicking a drive opens it in File Explorer without changing the selected group. Each drive menu item has a tooltip explaining the middle-click action.
+Opt-in `[Taskbar layout]` logs include DPI, both free sections, measured widths of all four views, chosen side, visible/hidden counts, final width and mode (0 full, 1 compact, 2 tiles, 3 list button, -1 no room).
+
+The left-click groups are Automatic mode, Local drives and External drives; Selected drives provides a saved manual set. Automatic mode here displays all detected drives; taskbar positioning is a separate setting. Middle-clicking a drive opens it in File Explorer without changing the selected group. Every command and submenu option in both taskbar menus has a short native hover tooltip in Russian or English, following the Windows interface language. Drive hints explain left-click selection and middle-click opening. Dimmed informational entries also support hints without applying settings; separators have no tooltip.
+
+## Manual selection of multiple drives
+
+Open **Selected drives** in either taskbar menu and check the required letters. Each check applies immediately and activates the manual set; internal and external drives can be combined. **Show selected drives** restores the saved set after switching groups; turning it off returns to the previous single drive. Choosing a drive outside this submenu still activates single-drive mode.
+
+The taskbar, More · N and Drives · N card contain only currently connected drives in the manual set, in drive-letter order. Newly connected unchecked devices are excluded. A disconnected selected drive keeps its check and appears as disconnected in the submenu; it returns to the taskbar when the same letter reconnects. Selection follows letters, not physical devices: if Windows assigns a letter to another volume, that volume is displayed.
+
+An empty set shows No drives selected rather than reverting to all drives. Hover hints explain the checkboxes; middle-click opens a connected drive in File Explorer without changing the set. Explorer restarts and Reset appearance preserve the selection. **Apply Windhawk settings** clears manual checks because the set is configured only through the menu.
 
 ## All local drives
-The left-click menu offers Automatic mode, Local drives and External drives, with a saved group selection and distinct icons. External drives include removable media and devices reporting USB/IEEE 1394 or removable media through Windows storage properties. If a fixed drive cannot be queried, it remains in the local group.
+The left-click menu offers Automatic mode, Local drives, External drives and Selected drives, with saved selections and distinct icons. External drives include removable media and devices reporting USB/IEEE 1394 or removable media through Windows storage properties. If a fixed drive cannot be queried, it remains in the local group.
 
-USB flash drives and external disks are detected automatically within approximately two seconds after Windows assigns or removes a drive letter. In all-drive mode they appear or disappear automatically; single-drive mode keeps the selected drive. Network drives and devices without drive letters are excluded.
+USB flash drives and external disks are detected automatically within approximately two seconds after Windows assigns or removes a drive letter. Automatic/local/external groups include newly detected matching drives; the manual set includes only checked letters, while single-drive mode keeps its selected drive. Network drives and devices without drive letters are excluded.
 
 
-Enable **Show all drives** in settings or **Automatic mode** in either taskbar menu. Each local volume has its own column, warning color and free/used strip in Color bar mode. Format, precision, themes and Mini design apply to all columns. Selecting a particular drive returns to single-drive mode; turning the all-drive option off restores the previous selected drive.
+Enable **Show all drives** in settings or **Automatic mode** in either taskbar menu. Each local volume has its own column, warning color and free/used strip in Color bar mode. Format, precision, themes and Compact mode apply to all columns. Selecting a particular drive returns to single-drive mode; turning the all-drive option off restores the previous selected drive.
 
-Volumes appear in drive-letter order. Custom names apply only to the configured drive. Drive-letter changes are detected every two seconds, with a full inventory refresh every 30 seconds; capacity uses the configured interval and Refresh now. On limited space, automatic Mini design tries compact text and letter tiles, then a list button if needed. No aggregate capacity is shown. Network drives remain excluded; removable USB drives are supported.
+Volumes appear in drive-letter order. Custom names apply only to the configured drive. Drive-letter changes are detected every two seconds, with a full inventory refresh every 30 seconds; capacity uses the configured interval and Refresh now. On horizontal taskbars, only the fitting prefix is shown, with More · N for the remaining drives. Automatic is a fallback when no card fits in the selected design. No aggregate capacity is shown. Network drives remain excluded; removable USB drives are supported.
 
 ## Screenshots
 
@@ -163,25 +173,35 @@ Both this mod and taskbar-disk-space-label display free space and total capacity
 
 ## Автоматическое размещение и компактные виды
 
-На горизонтальной панели мод измеряет содержимое и свободные участки между видимыми кнопками, виджетом и треем. При центральных значках сначала проверяется левый участок после виджета; при левом выравнивании — правый перед треем. Если полный вид помещается только на другой стороне, автоматическое положение переключается туда. Ручной выбор стороны сохраняется.
+На горизонтальной панели мод измеряет каждую карточку диска и свободные участки между видимыми кнопками, виджетом и треем в логических единицах XAML. В режиме списка автоматическое положение выбирает сторону, где помещается больше целых карточек выбранного вида. При одинаковом количестве центральные значки предпочитают левый участок после виджета, а значки с левым выравниванием — правый перед треем. Ручной выбор стороны сохраняется.
 
-При нехватке места авто мини-дизайн последовательно пробует прежний компактный текст и плитки с буквами дисков на постоянно видимом фоне свободного/занятого места. «Мини дизайн → Буквы дисков и полоса» позволяет включить плитки вручную. В высококонтрастной теме фон отключается, системный цвет текста сохраняется. Если весь список не помещается, показывается кнопка «Диски · N» с доступом к меню. Если не помещается даже она или геометрия штатной панели ещё недоступна, индикатор временно скрывается. Проверка размещения выполняется не реже раза в пять секунд.
+В режиме списка отображается столько первых дисков в порядке букв, сколько помещается целиком, с заранее отведённым местом для кнопки «Ещё · N». Она показывает число скрытых дисков. Выбранный обычный вид, компактный текст или плитки сохраняются. При наведении на «Ещё» появляется пассивная карточка с данными скрытых дисков, при нажатии левой кнопкой — полное меню выбора. Выбранная группа и полный список показаний сохраняются. Например, восемь дисков могут отображаться как C:, D:, E: и «Ещё · 5». Форматы, палитры и предупреждения применяются отдельно к каждому диску.
 
-В режиме списка фон каждого диска при наведении показывает доли свободного/занятого места с плавной анимацией (тема «Цветная полоса»). «Мини дизайн → Диски · N» вручную включает кнопку списка; этот вариант имеет приоритет над плитками и скрытием имени. Подсказка кнопки содержит объём каждого диска выбранной группы с текущим форматом и точностью. В вертикальном положении ручная кнопка списка также доступна.
+Если не помещается ни одна карточка вместе с «Ещё», авто мини-дизайн может попробовать компактный текст, затем плитки; весь список больше не уменьшается, если часть карточек уже помещается в выбранном виде. Если ни одна карточка не помещается, остаётся «Диски · N»; индикатор скрывается только при отсутствии места даже для неё или при недоступной геометрии панели. Ручной «Диски · N» всегда имеет приоритет. Проверка выполняется не реже раза в пять секунд; сокращение происходит при ближайшей проверке, а для возврата карточки нужны восемь свободных единиц XAML сверх её ширины, чтобы уменьшить мигание у границы. Одиночный режим и вертикальный список сохраняют прежнее поведение. В высококонтрастной теме сохраняются системные цвета, цветовые фоны отключены.
 
-В режиме диагностики журнал `[Taskbar layout]` показывает DPI, оба свободных участка, измеренную ширину четырёх вариантов, выбранную сторону и вид (0 — полный, 1 — мини, 2 — плитки, 3 — кнопка списка, -1 — нет места).
+В режиме списка общий контейнер остаётся прозрачным. В темах «Системная» и «Цветная полоса» нейтральным фоном подсвечивается только диск под курсором; нижняя полоса свободного/занятого места сохраняется, заливка объёма при наведении не появляется. «Фон свободного места» сохраняет постоянную заливку, а при наведении поверх неё появляется лёгкая нейтральная подсветка только выбранной курсором карточки; такая же подсветка есть у плиток букв. Она плавно появляется и исчезает за 120 мс, учитывает настройки анимации Windows и не меняет прозрачность самой заливки места. «Только текст» сохраняет отсутствие подсветки. «Компактный режим → Диски · N» вручную включает кнопку списка; этот вариант имеет приоритет над плитками и скрытием имени. Подсказка оформлена как скруглённая карточка с названием группы, количеством дисков и отдельными блоками: буква, имя, объём в текущем формате и точности, процент свободного места и шкала свободно/занято в выбранной палитре. Имена и объёмы ограничены двумя строками. Карточка пассивная: большие списки размещаются в колонках в пределах рабочей области монитора; если все диски не помещаются, показано количество оставшихся. Поддерживаются светлая, тёмная и высококонтрастная темы Windows. В вертикальном положении ручная кнопка списка также доступна.
 
-В меню левой кнопки группы называются «Автоматический режим», «Локальные диски», «Внешние диски». Здесь «Автоматический режим» означает показ всех обнаруженных дисков; выбор положения панели задаётся отдельно. Средняя кнопка мыши на конкретном диске открывает его в Проводнике, не меняя выбранную группу. Подсказка при наведении на пункт диска напоминает об этом действии.
+В режиме диагностики журнал `[Taskbar layout]` показывает DPI, оба свободных участка, измеренную ширину четырёх вариантов, выбранную сторону, число видимых/скрытых дисков, итоговую ширину и вид (0 — полный, 1 — мини, 2 — плитки, 3 — кнопка списка, -1 — нет места).
+
+В меню левой кнопки группы называются «Автоматический режим», «Локальные диски», «Внешние диски»; «Выбранные диски» задаёт сохранённый ручной набор. Здесь «Автоматический режим» означает показ всех обнаруженных дисков; выбор положения панели задаётся отдельно. Средняя кнопка мыши на конкретном диске открывает его в Проводнике, не меняя выбранную группу. У каждого пункта обоих меню, включая подменю и варианты выбора, есть короткая штатная подсказка при наведении. Язык соответствует интерфейсу Windows — русский или английский. Подсказка диска поясняет выбор левой кнопкой и открытие средней. Серые информационные строки также поддерживают подсказки, не изменяя настройки; у разделителей подсказок нет.
+
+## Ручной выбор нескольких дисков
+
+В обоих меню индикатора откройте **«Выбранные диски»** и отметьте нужные буквы. Каждая отметка применяется сразу и включает ручной набор; можно смешивать локальные и внешние диски. **«Показывать выбранные диски»** возвращает сохранённый набор после переключения на другую группу; выключение возвращает прежний одиночный диск. Выбор отдельного диска вне этого подменю по-прежнему включает одиночный режим.
+
+На панели, в «Ещё · N» и карточке «Диски · N» учитываются только подключённые диски ручного набора, в порядке букв. Новые неотмеченные устройства в набор не добавляются. При отключении отмеченного диска его отметка сохраняется, в подменю появляется строка «отключён», а на панели он возвращается при подключении с той же буквой. Выбор привязан к буквам, а не к физическому устройству: если Windows назначит букву другому тому, отображаться будет этот том.
+
+Если снять все отметки, отображается сообщение «Диски не выбраны»; автоматический показ всех дисков не включается. Подсказки поясняют назначение галочек; средняя кнопка на подключённом диске открывает его в Проводнике, не меняя набор. Перезапуск Explorer и «Сбросить оформление» сохраняют выбор. **«Применить настройки Windhawk»** очищает ручные отметки, поскольку набор задаётся только через меню.
 
 ## Все локальные диски
-В меню левой кнопки доступны «Автоматический режим», «Локальные диски» и «Внешние диски». Выбранная группа сохраняется. Локальные диски и внешние устройства имеют разные значки. Внешними считаются съёмные носители и диски, для которых Windows сообщает USB/IEEE 1394 или съёмный носитель; если запрос свойств фиксированного диска недоступен, он остаётся в локальной группе.
+В меню левой кнопки доступны «Автоматический режим», «Локальные диски», «Внешние диски» и «Выбранные диски». Выбранная группа сохраняется. Локальные диски и внешние устройства имеют разные значки. Внешними считаются съёмные носители и диски, для которых Windows сообщает USB/IEEE 1394 или съёмный носитель; если запрос свойств фиксированного диска недоступен, он остаётся в локальной группе.
 
-USB-флешки и внешние диски определяются автоматически примерно за две секунды после назначения или удаления буквы диска Windows. В режиме всех дисков они появляются и исчезают автоматически; одиночный режим сохраняет выбранный диск. Сетевые диски и устройства без буквы не отображаются.
+USB-флешки и внешние диски определяются автоматически примерно за две секунды после назначения или удаления буквы диска Windows. В автоматической/локальной/внешней группе новые подходящие диски появляются сами; в ручном наборе — только отмеченные буквы. Одиночный режим сохраняет выбранный диск. Сетевые диски и устройства без буквы не отображаются.
 
 
 Включите **«Показывать все диски»** в настройках или **«Автоматический режим»** в меню левой или правой кнопки. Диски показаны колонками в порядке букв. Для каждого отдельно отображаются объём, предупреждение о нехватке места и тонкая полоса свободного/занятого места в теме «Цветная полоса». Формат, точность, тема и мини-дизайн общие.
 
-Выбор конкретного диска возвращает одиночный режим. Отключение режима возвращает прежний выбранный диск. Собственное имя применяется только к начальному диску. Изменения букв дисков проверяются каждые две секунды, полный список обновляется раз в 30 секунд; объём — по заданному интервалу и через «Обновить сейчас». При недостатке места используются компактный текст и плитки с буквами, затем кнопка списка. Общий объём дисков не суммируется. USB-флешки и внешние диски включены; сетевые диски исключены.
+Выбор конкретного диска возвращает одиночный режим. Отключение режима возвращает прежний выбранный диск. Собственное имя применяется только к начальному диску. Изменения букв дисков проверяются каждые две секунды, полный список обновляется раз в 30 секунд; объём — по заданному интервалу и через «Обновить сейчас». На горизонтальной панели отображаются только помещающиеся первые диски, остальные доступны через «Ещё · N». Автоматический компактный режим используется, если в выбранном виде не помещается ни одна карточка. Общий объём дисков не суммируется. USB-флешки и внешние диски включены; сетевые диски исключены.
 
 ## Управление с панели задач
 
@@ -197,7 +217,7 @@ USB-флешки и внешние диски определяются авто�
 | Правая кнопка → **Применить настройки Windhawk** | Возвращает значения страницы настроек |
 | Правая кнопка → **Точность** | 0, 1 или 2 знака после запятой для ГиБ и процентов; выбор сохраняется |
 | Правая кнопка → **Формат** | Свободно / Всего, Занято / Всего или Свободно, %; выбор сохраняется |
-| Правая кнопка → **Мини дизайн → Скрывать имя диска** | Скрывает имя диска и включает одну компактную строку; повторное нажатие возвращает две строки |
+| Правая кнопка → **Компактный режим → Скрывать имя диска** | Скрывает имя диска и включает одну компактную строку; повторное нажатие возвращает две строки |
 | Правая кнопка → **Открыть выбранный диск** | Открывает выбранный в индикаторе диск в Проводнике |
 | Правая кнопка → **Этот компьютер** | Открывает раздел Проводника со списком дисков |
 | Правая кнопка → **Управление дисками** | Открывает системную консоль с запросом прав администратора |
@@ -205,18 +225,20 @@ USB-флешки и внешние диски определяются авто�
 
 Выбранные диск и тема сохраняются после перезапуска Explorer. Изменение начального
 диска или цветовой схемы в настройках Windhawk заменяет соответствующий выбор из меню.
-«Мини дизайн» сохраняется после перезапуска Explorer. Изменение настройки «Скрывать имя диска» заменяет выбор из меню. Остальные настройки сохраняют выбор.
+«Компактный режим» сохраняется после перезапуска Explorer. Изменение настройки «Скрывать имя диска» заменяет выбор из меню. Остальные настройки сохраняют выбор.
 
 ## Рамка и цветовые темы
 
-В меню «Тема» доступны **Системная** (нейтральная подсветка), **Цветная полоса** (свободное/занятое место, включена по умолчанию), **Фон свободного места** и **Только текст** (без подсветки). Новая тема постоянно показывает доли свободного/занятого места фоном каждого диска списка, без нижней полосы; при наведении фон плавно становится ярче. В высококонтрастном режиме цветовой фон отключён, а плитки букв сохраняют собственное оформление. Выбор сохраняется после перезапуска Explorer. Подменю «Цвета» доступно для цветной полосы и фона; другие темы сохраняют выбранную палитру. Мини дизайн работает с любой темой.
+В меню «Тема» доступны **Системная** (нейтральная подсветка), **Цветная полоса** (свободное/занятое место, включена по умолчанию), **Фон свободного места** и **Только текст** (без подсветки). Новая тема постоянно показывает доли свободного/занятого места фоном каждого диска списка, без нижней полосы; прозрачность фона соответствует рамке «Пуска». В высококонтрастном режиме цветовой фон отключён, а плитки букв сохраняют собственное оформление. Выбор сохраняется после перезапуска Explorer. Менять палитру можно для цветной полосы и фона; в других темах серое подменю «Цвета» открывается для пояснений, но выбор цвета не действует и прежняя палитра сохраняется. Компактный режим работает с любой темой.
 
-При наведении появляется закруглённая полупрозрачная рамка. Её высота и скругление
+Карточки списка и кнопка «Ещё» используют высоту и скругление рамки «Пуска»; текст центрируется. Нейтральный и цветной фон используют её эффективный альфа-канал с учётом прозрачности кисти. Если полупрозрачную кисть получить нельзя, используется системная кисть или резервное значение 16/255 (около 6% непрозрачности). На вертикальной панели эта высота служит минимумом, чтобы не обрезать многострочный текст.
+
+В одиночном режиме при наведении появляется закруглённая полупрозрачная рамка. Её высота и скругление
 берутся у подсветки кнопки **«Пуск»**, ширина автоматически подстраивается под текст
 и доступное место. Длинный текст сокращается с многоточием. Доступная ширина учитывает кнопки панели и трей с зазором 12 логических единиц. Если остаётся менее 72 единиц, индикатор временно скрывается и возвращается после освобождения места. Расчёт повторяется при обновлении интерфейса, не реже раза в пять секунд.
 
 Подсветка плавно меняется при наведении и нажатии; анимации учитывают системную
-настройку Windows. Всплывающая подсказка не используется.
+настройку Windows. Для кнопок «Диски · N» и «Ещё · N» доступны подсказки с данными дисков.
 
 Цветная полоса показывает долю свободного и занятого места. По умолчанию свободное
 место зелёное, занятое — красное. Доступны также синий/оранжевый,
@@ -226,11 +248,7 @@ USB-флешки и внешние диски определяются авто�
 
 ## Быстрые настройки и восстановление
 
-- **Мини дизайн → Авто мини дизайн** включён по умолчанию. Когда обычный вид не помещается,
-  индикатор пробует компактную строку и использует её только если она уже обычного
-  вида. После освобождения места возвращается прежний вид. Ручной «Мини дизайн»
-  остаётся приоритетным; если и компактному виду не хватает места, текст сокращается
-  или индикатор временно скрывается.
+- **Компактный режим → Автоматически** всегда включён: пункт отмечен галочкой и недоступен для переключения. Старое сохранённое выключение автоматически заменяется включением. В режиме списка сначала сохраняются помещающиеся карточки выбранного вида с кнопкой «Ещё · N»; более компактный вид пробуется, если не помещается ни одна карточка. Одиночный режим сохраняет прежний переход к компактной строке и плиткам. Ручной «Компактный режим» остаётся приоритетным.
 - **Нехватка места** предлагает выключение, пороги 5/10/15/20 % и 5/10/20/50 ГиБ.
   Текущий пользовательский порог также отображается; произвольное значение можно
   задать в настройках Windhawk.
@@ -366,8 +384,8 @@ Windhawk **1.7.3 и 2.0**, штатная нижняя горизонтальн�
 - FreeColor: "green-red"
   $name: Free/used colors
   $name:ru-RU: Цвета свободно/всего
-  $description: Preset colors for free and used space on hover.
-  $description:ru-RU: Заранее заготовленная пара цветов для свободного и занятого места при наведении.
+  $description: Preset colors for free and used space in capacity strips and backgrounds.
+  $description:ru-RU: Пара цветов свободного и занятого места для полос и фонового отображения объёма.
   $options:
     - "green-red": "Green / Red"
     - "blue-orange": "Blue / Orange"
@@ -494,6 +512,7 @@ struct Settings {
     bool layoutDiagnostics = false;
     bool showAllDrives = false;
     std::wstring driveGroup = L"all";
+    DWORD manualDrives = 0;
     bool autoCompact = true;
     bool letterTiles = false;
     bool summaryButton = false;
@@ -534,23 +553,94 @@ std::wstring DriveTooltip(const Reading& reading) {
     return text;
 }
 
+Reading HiddenDriveReading(const Reading& reading, size_t visible) {
+    Reading hidden;
+    if (visible < reading.drives.size())
+        hidden.drives.assign(reading.drives.begin() + visible, reading.drives.end());
+    return hidden;
+}
+
+struct TooltipDisk {
+    std::wstring letter, name, capacity;
+    double freeRatio = 0.0;
+    bool hasRatio = false, lowSpace = false;
+};
+
+std::vector<TooltipDisk> TooltipDisks(const Reading& reading, bool showAll) {
+    std::vector<TooltipDisk> disks;
+    auto append = [&](const Reading& disk) {
+        TooltipDisk item;
+        item.letter = disk.compactTitle;
+        if (item.letter.size() >= 4 && item.letter.front() == L'(' && item.letter.back() == L')')
+            item.letter = item.letter.substr(1, item.letter.size() - 2);
+        if (item.letter.empty()) item.letter = L"?";
+        item.name = disk.title;
+        if (!disk.compactTitle.empty()) {
+            const auto suffix = L" " + disk.compactTitle;
+            if (item.name.ends_with(suffix)) item.name.resize(item.name.size() - suffix.size());
+            else if (item.name == disk.compactTitle) item.name.clear();
+        }
+        item.capacity = disk.capacity;
+        item.hasRatio = disk.hasRatio && std::isfinite(disk.freeRatio);
+        item.freeRatio = item.hasRatio ? std::clamp(disk.freeRatio, 0.0, 1.0) : 0.0;
+        item.lowSpace = disk.lowSpace;
+        disks.push_back(std::move(item));
+    };
+    if (!reading.drives.empty()) {
+        for (const auto& disk : reading.drives) append(disk);
+    } else if (!showAll) {
+        append(reading);
+    }
+    return disks;
+}
+
+struct TooltipLayout {
+    size_t columns = 1, rows = 1, visible = 0;
+    double width = 330;
+};
+
+TooltipLayout PassiveTooltipLayout(size_t count, double workWidth, double workHeight) {
+    TooltipLayout layout;
+    if (!std::isfinite(workWidth) || workWidth <= 0) workWidth = 800;
+    if (!std::isfinite(workHeight) || workHeight <= 0) workHeight = 600;
+    const double availableWidth = std::max(1.0,workWidth-62.0);
+    const double availableHeight = std::max(1.0,workHeight-140.0);
+    const auto maxRows = std::max<size_t>(1,static_cast<size_t>(availableHeight/104.0));
+    const auto maxColumns = std::max<size_t>(1,static_cast<size_t>((availableWidth+8.0)/248.0));
+    layout.columns = std::min(maxColumns,std::max<size_t>(1,(count+maxRows-1)/maxRows));
+    layout.visible = std::min(count,maxRows*layout.columns);
+    layout.rows = std::min(maxRows,std::max<size_t>(1,layout.visible));
+    const double columnWidth = std::min(330.0,
+        (availableWidth-8.0*(layout.columns-1))/layout.columns);
+    layout.width = columnWidth*layout.columns+8.0*(layout.columns-1);
+    return layout;
+}
+
+BYTE EffectiveBrushAlpha(BYTE alpha, double opacity) {
+    if (!std::isfinite(opacity)) return 0;
+    return static_cast<BYTE>(std::lround(alpha * std::clamp(opacity, 0.0, 1.0)));
+}
+
 double DriveBackgroundOpacity(std::wstring_view appearance, bool hasRatio,
                               bool hovered, bool highContrast) {
-    if (!hasRatio || highContrast) return 0.0;
-    if (appearance == L"background") return hovered ? 1.0 : 0.65;
-    if (appearance == L"bar") return hovered ? 1.0 : 0.0;
-    return 0.0;
+    if (appearance == L"text") return 0.0;
+    if (appearance == L"background" && hasRatio && !highContrast)
+        return 1.0;
+    return hovered ? 1.0 : 0.0;
 }
 
 struct DriveCell {
     Border surface{nullptr};
     LinearGradientBrush hover{nullptr};
+    Border highlightLayer{nullptr};
+    SolidColorBrush highlight{nullptr};
     winrt::Windows::UI::Xaml::Media::Animation::Storyboard animation{nullptr};
     winrt::event_token entered{}, exited{};
     bool handlers = false;
     bool hovered = false;
     bool letterTile = false;
     double hoverTarget = 0.0;
+    double highlightTarget = 0.0;
     double freeRatio = 0;
     bool hasRatio = false;
     StackPanel panel{nullptr};
@@ -566,8 +656,15 @@ struct DriveCell {
 // destructors during Explorer process shutdown.
 struct UiState {
     std::wstring diagnosticSignature;
-    std::wstring tooltipText;
+    std::wstring tooltipSignature;
+    ToolTip summaryTip{nullptr};
+    FrameworkElement tooltipOwner{nullptr};
     bool summary = false;
+    Border overflowSurface{nullptr};
+    TextBlock overflowText{nullptr};
+    size_t visibleDrives = 0, hiddenDrives = 0;
+    std::wstring listLayoutSignature;
+    int listLayoutMode = -1;
     FrameworkElement frame{nullptr};
     FrameworkElement startButton{nullptr};
     FrameworkElement startBackground{nullptr};
@@ -726,6 +823,41 @@ std::wstring NormalizeDrive(std::wstring value) {
     return value;
 }
 
+DWORD ParseManualDrives(std::wstring_view text) {
+    DWORD mask = 0;
+    size_t cursor = 0;
+    while (cursor < text.size()) {
+        const auto end = text.find_first_of(L";, \t\r\n",cursor);
+        const auto token = text.substr(cursor,end == std::wstring_view::npos ? text.size()-cursor : end-cursor);
+        const auto drive = NormalizeDrive(std::wstring(token));
+        if (!drive.empty()) mask |= DWORD{1} << (drive[0]-L'A');
+        if (end == std::wstring_view::npos) break;
+        cursor = end+1;
+    }
+    return mask;
+}
+
+std::wstring SerializeManualDrives(DWORD mask) {
+    std::wstring text;
+    for (int letter = 0; letter < 26; ++letter) {
+        if (!(mask & (DWORD{1} << letter))) continue;
+        if (!text.empty()) text += L';';
+        text += static_cast<wchar_t>(L'A'+letter);
+        text += L':';
+    }
+    return text;
+}
+
+bool MatchesDriveGroup(const Settings& settings, const std::wstring& drive, bool external) {
+    if (settings.driveGroup == L"local") return !external;
+    if (settings.driveGroup == L"external") return external;
+    if (settings.driveGroup == L"manual") {
+        const auto normalized = NormalizeDrive(drive);
+        return !normalized.empty() && (settings.manualDrives & (DWORD{1} << (normalized[0]-L'A'))) != 0;
+    }
+    return true;
+}
+
 void LoadSettings() {
     Settings settings;
     settings.layoutDiagnostics = Wh_GetIntSetting(L"LayoutDiagnostics") != 0;
@@ -740,8 +872,9 @@ void LoadSettings() {
     }
     settings.showAllDrives = selectedAll == L"1";
     settings.driveGroup = LocalStringValue(L"SelectedDriveGroup");
-    if (settings.driveGroup != L"local" && settings.driveGroup != L"external")
+    if (settings.driveGroup != L"local" && settings.driveGroup != L"external" && settings.driveGroup != L"manual")
         settings.driveGroup = L"all";
+    settings.manualDrives = ParseManualDrives(LocalStringValue(L"SelectedManualDrives"));
     const std::wstring configuredDrive = NormalizeDrive(StringSetting(L"Drive"));
     const std::wstring previousConfigured =
         NormalizeDrive(LocalStringValue(kConfiguredDriveValue));
@@ -801,7 +934,9 @@ void LoadSettings() {
         Wh_SetStringValue(L"SelectedTheme", selectedTheme.c_str());
     }
     settings.colorScheme = selectedTheme;
-    settings.autoCompact = LocalStringValue(L"SelectedAutoCompact") != L"0";
+    settings.autoCompact = true;
+    if (LocalStringValue(L"SelectedAutoCompact") != L"1")
+        Wh_SetStringValue(L"SelectedAutoCompact", L"1");
     const auto precision = LocalStringValue(L"SelectedPrecision");
     if (precision == L"0" || precision == L"1" || precision == L"2")
         settings.precision = precision[0] - L'0';
@@ -1005,8 +1140,7 @@ Reading ReadDrives(const Settings& settings, bool russian) {
     if (!settings.showAllDrives) return ReadDisk(settings, russian);
     Reading result;
     for (const auto& option : CachedDrives()) {
-        if ((settings.driveGroup == L"local" && option.external) ||
-            (settings.driveGroup == L"external" && !option.external)) continue;
+        if (!MatchesDriveGroup(settings,option.drive,option.external)) continue;
         Settings diskSettings = settings;
         diskSettings.drive = option.drive;
         auto disk = ReadDisk(diskSettings, russian);
@@ -1015,19 +1149,42 @@ Reading ReadDrives(const Settings& settings, bool russian) {
         result.drives.push_back(std::move(disk));
     }
     if (result.drives.empty()) {
-        result.title = UiText(russian, L"No matching drives", L"Нет дисков выбранной группы");
-        result.capacity = UiText(russian, L"Drive unavailable", L"Диск недоступен");
+        const bool emptySelection = settings.driveGroup == L"manual" && !settings.manualDrives;
+        result.title = emptySelection ? UiText(russian,L"No drives selected",L"Диски не выбраны") :
+            UiText(russian, L"No matching drives", L"Нет дисков выбранной группы");
+        result.capacity = emptySelection ? UiText(russian,L"Choose drives in the menu",L"Отметьте диски в меню") :
+            UiText(russian, L"Drive unavailable", L"Диск недоступен");
     }
     return result;
 }
 
 void SetAllDrives(bool enabled, const std::wstring& group = L"all") {
-    Wh_SetStringValue(L"SelectedDriveGroup", group.c_str());
-    Wh_SetStringValue(L"SelectedAllDrives", enabled ? L"1" : L"0");
     {
         std::lock_guard lock(g_settingsMutex);
+        Wh_SetStringValue(L"SelectedDriveGroup", group.c_str());
+        Wh_SetStringValue(L"SelectedAllDrives", enabled ? L"1" : L"0");
         g_settings.showAllDrives = enabled;
         g_settings.driveGroup = group;
+    }
+    if (g_changed) SetEvent(g_changed);
+}
+
+void SetManualDrive(const std::wstring& drive, bool enabled) {
+    const auto normalized = NormalizeDrive(drive);
+    if (normalized.empty()) return;
+    const DWORD bit = DWORD{1} << (normalized[0]-L'A');
+    {
+        // Merge into the current selection, so different taskbar menus cannot
+        // overwrite each other's choices with an old captured settings snapshot.
+        std::lock_guard lock(g_settingsMutex);
+        if (enabled) g_settings.manualDrives |= bit;
+        else g_settings.manualDrives &= ~bit;
+        const auto value = SerializeManualDrives(g_settings.manualDrives);
+        Wh_SetStringValue(L"SelectedManualDrives",value.c_str());
+        Wh_SetStringValue(L"SelectedDriveGroup",L"manual");
+        Wh_SetStringValue(L"SelectedAllDrives",L"1");
+        g_settings.showAllDrives = true;
+        g_settings.driveGroup = L"manual";
     }
     if (g_changed) SetEvent(g_changed);
 }
@@ -1037,10 +1194,10 @@ void SelectDrive(const std::wstring& drive) {
     if (std::none_of(drives.begin(), drives.end(), [&](const auto& option) {
             return option.drive == drive;
         })) return;
-    Wh_SetStringValue(kSelectedDriveValue, drive.c_str());
-    Wh_SetStringValue(L"SelectedAllDrives", L"0");
     {
         std::lock_guard lock(g_settingsMutex);
+        Wh_SetStringValue(kSelectedDriveValue, drive.c_str());
+        Wh_SetStringValue(L"SelectedAllDrives", L"0");
         g_settings.drive = drive;
         g_settings.showAllDrives = false;
     }
@@ -1049,6 +1206,94 @@ void SelectDrive(const std::wstring& drive) {
 }
 
 FontIcon MenuIcon(PCWSTR glyph);
+
+void MenuHint(FrameworkElement const& item, const std::wstring& text) {
+    // Let XAML own the plain-text tooltip and its open/close lifetime.
+    ToolTipService::SetToolTip(item,winrt::box_value(text));
+    Automation::AutomationProperties::SetHelpText(item,text);
+}
+
+void MenuHint(FrameworkElement const& item, bool russian, PCWSTR english, PCWSTR translated) {
+    MenuHint(item,UiText(russian,english,translated));
+}
+
+void DriveMiddleClick(UIElement const& item, const std::wstring& drive) {
+    // Receive middle clicks even if the menu handles the routed event internally.
+    item.AddHandler(UIElement::PointerPressedEvent(),winrt::box_value(
+        winrt::Windows::UI::Xaml::Input::PointerEventHandler{
+            [drive](auto const& sender, auto const& args) {
+                if (!args.GetCurrentPoint(sender.template as<UIElement>()).Properties().IsMiddleButtonPressed()) return;
+                args.Handled(true);
+                const auto root = drive+L"\\";
+                const auto result = reinterpret_cast<INT_PTR>(ShellExecuteW(
+                    nullptr,L"open",root.c_str(),nullptr,nullptr,SW_SHOWNORMAL));
+                if (result <= 32) Wh_Log(L"Cannot open drive %s: ShellExecute error %d",
+                    drive.c_str(),static_cast<int>(result));
+            }}),true);
+}
+
+void AppendManualDriveMenu(MenuFlyout const& menu, bool russian, const Settings& settings,
+                           const std::vector<DriveOption>& drives) {
+    MenuFlyoutSubItem manual;
+    const bool active = settings.showAllDrives && settings.driveGroup == L"manual";
+    manual.Text((active ? std::wstring(L"✓ ") : std::wstring{})+
+        UiText(russian,L"Selected drives",L"Выбранные диски"));
+    manual.Icon(MenuIcon(L"\uE73A"));
+    MenuHint(manual,russian,L"Check the drives to display; the saved selection follows drive letters",
+        L"Отметьте диски для отображения; сохранённый выбор привязан к буквам");
+    ToggleMenuFlyoutItem useSelection;
+    useSelection.Text(UiText(russian,L"Show selected drives",L"Показывать выбранные диски"));
+    useSelection.Icon(MenuIcon(L"\uE73A"));
+    useSelection.IsChecked(active);
+    MenuHint(useSelection,russian,L"Restore this saved set; turning off returns to the selected single drive",
+        L"Включить сохранённый набор; выключение возвращает выбранный одиночный диск");
+    useSelection.Click([](auto const& sender, auto const&) {
+        SetAllDrives(sender.template as<ToggleMenuFlyoutItem>().IsChecked(),L"manual");
+    });
+    manual.Items().Append(useSelection);
+    manual.Items().Append(MenuFlyoutSeparator());
+    DWORD available = 0;
+    auto append = [&](const std::wstring& drive, const std::wstring& label, bool external, bool connected) {
+        ToggleMenuFlyoutItem item;
+        item.Text(label+L" ("+drive+L")"+(connected ? L"" : UiText(russian,L" — disconnected",L" — отключён")));
+        item.Icon(MenuIcon(connected ? (external ? L"\uE88E" : L"\uEDA2") : L"\uE8B7"));
+        item.IsChecked((settings.manualDrives & ParseManualDrives(drive)) != 0);
+        if (!connected) item.Opacity(0.55);
+        MenuHint(item,russian,
+            connected ? L"Check to include this drive; middle-click opens it in File Explorer" :
+                L"Saved drive is disconnected; uncheck to remove it from the set",
+            connected ? L"Отметьте для включения в набор; средняя кнопка открывает диск в Проводнике" :
+                L"Сохранённый диск отключён; снимите отметку, чтобы убрать его из набора");
+        item.Click([drive](auto const& sender, auto const&) {
+            SetManualDrive(drive,sender.template as<ToggleMenuFlyoutItem>().IsChecked());
+        });
+        if (connected) DriveMiddleClick(item,drive);
+        manual.Items().Append(item);
+    };
+    for (const auto& option : drives) {
+        available |= ParseManualDrives(option.drive);
+        const auto label = option.label.empty() ? UiText(russian,
+            option.external ? L"External drive" : L"Local drive",
+            option.external ? L"Внешний диск" : L"Локальный диск") : option.label;
+        append(option.drive,label,option.external,true);
+    }
+    const DWORD disconnected = settings.manualDrives & ~available;
+    if (disconnected) manual.Items().Append(MenuFlyoutSeparator());
+    for (int letter = 0; letter < 26; ++letter) {
+        if (disconnected & (DWORD{1} << letter))
+            append(std::wstring{static_cast<wchar_t>(L'A'+letter),L':'},
+                UiText(russian,L"Saved drive",L"Сохранённый диск"),false,false);
+    }
+    if (drives.empty() && !disconnected) {
+        MenuFlyoutItem empty;
+        empty.Text(UiText(russian,L"No available drives",L"Нет доступных дисков"));
+        empty.Opacity(0.55);
+        MenuHint(empty,russian,L"Reconnect the device and reopen the menu",
+            L"Подключите устройство и переоткройте меню");
+        manual.Items().Append(empty);
+    }
+    menu.Items().Append(manual);
+}
 
 void ShowDriveMenu() {
     if (!g_ui.surface) return;
@@ -1064,10 +1309,16 @@ void ShowDriveMenu() {
             external ? UiText(russian, L"External drives", L"Внешние диски") :
             UiText(russian, L"Local drives", L"Локальные диски"));
         item.Icon(MenuIcon(selection == L"all" ? L"\uE713" : external ? L"\uE88E" : L"\uEDA2"));
+        MenuHint(item,russian,
+            selection == L"all" ? L"Show all detected drives; only fitting cards appear on the taskbar" :
+            external ? L"Show only USB flash drives and external disks" : L"Show only internal local drives",
+            selection == L"all" ? L"Показывать все обнаруженные диски; на панели — только помещающиеся карточки" :
+            external ? L"Показывать только USB-флешки и внешние диски" : L"Показывать только внутренние локальные диски");
         item.IsChecked(settings.showAllDrives && settings.driveGroup == selection);
         item.Click([selection](auto const&, auto const&) { SetAllDrives(true, selection); });
         menu.Items().Append(item);
     }
+    AppendManualDriveMenu(menu,russian,settings,drives);
     menu.Items().Append(MenuFlyoutSeparator());
     for (const auto& option : drives) {
         const auto& drive = option.drive;
@@ -1078,21 +1329,10 @@ void ShowDriveMenu() {
         std::wstring text = (!settings.showAllDrives && drive == settings.drive ? L"✓ " : L"  ") +
                             label + L" (" + drive + L")";
         item.Text(text);
-        ToolTipService::SetToolTip(item, winrt::box_value(UiText(russian,
-            L"Middle-click to open this drive in File Explorer",
-            L"Нажмите средней кнопкой мыши, чтобы открыть диск в Проводнике")));
-        // Receive middle clicks even if MenuFlyoutItem handles the routed event internally.
-        item.AddHandler(UIElement::PointerPressedEvent(), winrt::box_value(
-            winrt::Windows::UI::Xaml::Input::PointerEventHandler{
-                [drive](auto const& sender, auto const& args) {
-                    if (!args.GetCurrentPoint(sender.template as<UIElement>()).Properties().IsMiddleButtonPressed()) return;
-                    args.Handled(true);
-                    const std::wstring root = drive + L"\\";
-                    const auto result = reinterpret_cast<INT_PTR>(ShellExecuteW(
-                        nullptr, L"open", root.c_str(), nullptr, nullptr, SW_SHOWNORMAL));
-                    if (result <= 32) Wh_Log(L"Cannot open drive %s: ShellExecute error %d",
-                        drive.c_str(), static_cast<int>(result));
-                }}), true);
+        MenuHint(item,russian,
+            L"Left-click to show this drive; middle-click to open it in File Explorer",
+            L"Левая кнопка — показывать этот диск; средняя — открыть его в Проводнике");
+        DriveMiddleClick(item,drive);
 
         item.Click([drive](winrt::Windows::Foundation::IInspectable const&,
                            winrt::Windows::UI::Xaml::RoutedEventArgs const&) {
@@ -1105,7 +1345,9 @@ void ShowDriveMenu() {
         item.Icon(MenuIcon(L"\uE8B7"));
         item.Text(UiText(russian, L"No local drives available",
                          L"Нет доступных локальных дисков"));
-        item.IsEnabled(false);
+        MenuHint(item,russian,L"No supported drive letters were detected; reconnect the device and reopen the menu",
+            L"Подходящие диски с буквами не найдены; подключите устройство и переоткройте меню");
+        item.Opacity(0.55); // Informational, with no Click action; keep hover hints accessible.
         menu.Items().Append(item);
     }
     // MenuFlyout is a native WinUI control, so its open/close animation,
@@ -1225,7 +1467,7 @@ void ApplyConfiguredSettings() {
     constexpr PCWSTR values[] = {
         L"SelectedDrive", L"SelectedTheme", L"SelectedMiniDesign", L"SelectedAppearance",
         L"SelectedFormat", L"SelectedPrecision", L"SelectedMonitor", L"SelectedPosition",
-        L"SelectedLowSpace", L"SelectedAutoCompact", L"SelectedAllDrives", L"SelectedDriveGroup", L"SelectedLetterTiles", L"SelectedSummaryButton"
+        L"SelectedLowSpace", L"SelectedAutoCompact", L"SelectedAllDrives", L"SelectedDriveGroup", L"SelectedManualDrives", L"SelectedLetterTiles", L"SelectedSummaryButton"
     };
     for (const auto value : values) Wh_DeleteValue(value);
     LoadSettings();
@@ -1254,13 +1496,18 @@ void ShowThemeMenu() {
     ToggleMenuFlyoutItem allDrives;
     allDrives.Text(UiText(russian, L"Automatic mode", L"Автоматический режим"));
     allDrives.Icon(MenuIcon(L"\uE713"));
+    MenuHint(allDrives,russian,L"Toggle all detected drives; turning off restores the selected single drive",
+        L"Показывать все обнаруженные диски; выключение возвращает выбранный одиночный диск");
     allDrives.IsChecked(settings.showAllDrives && settings.driveGroup == L"all");
     allDrives.Click([enabled = !(settings.showAllDrives && settings.driveGroup == L"all")](auto const&, auto const&) {
         SetAllDrives(enabled);
     });
     menu.Items().Append(allDrives);
+    AppendManualDriveMenu(menu,russian,settings,CachedDrives());
     menu.Items().Append(MenuFlyoutSeparator());
     themeMenu.Text(UiText(russian, L"Theme", L"Тема"));
+    MenuHint(themeMenu,russian,L"Choose the indicator background and capacity visualization",
+        L"Выбрать фон индикатора и оформление свободного/занятого места");
     constexpr ThemeOption appearances[] = {
         {L"system", L"System", L"Системная"},
         {L"bar", L"Color bar", L"Цветная полоса"},
@@ -1273,6 +1520,16 @@ void ShowThemeMenu() {
         std::wstring label = settings.appearance == appearance.id ? L"✓ " : L"  ";
         label += russian ? appearance.russian : appearance.english;
         item.Text(label);
+        const std::wstring appearanceId = appearance.id;
+        MenuHint(item,russian,
+            appearanceId == L"system" ? L"Neutral Windows-style hover background" :
+            appearanceId == L"bar" ? L"A free/used strip below each drive; neutral hover for drive lists" :
+            appearanceId == L"background" ? L"Persistent free/used background for each drive, without a bottom strip" :
+            L"Text without an indicator hover background",
+            appearanceId == L"system" ? L"Нейтральный фон при наведении в стиле Windows" :
+            appearanceId == L"bar" ? L"Полоса свободно/занято под каждым диском; нейтральная подсветка в списке" :
+            appearanceId == L"background" ? L"Постоянный фон свободно/занято у каждого диска, без нижней полосы" :
+            L"Текст без фона индикатора при наведении");
         item.Click([id = std::wstring(appearance.id)](auto const&, auto const&) {
             Wh_SetStringValue(L"SelectedAppearance", id.c_str());
             {
@@ -1288,14 +1545,26 @@ void ShowThemeMenu() {
     MenuFlyoutSubItem colorMenu;
     colorMenu.Icon(MenuIcon(L"\uE790"));
     colorMenu.Text(UiText(russian, L"Colors", L"Цвета"));
-    colorMenu.IsEnabled(settings.appearance == L"bar" || settings.appearance == L"background");
+    const bool colorsAvailable = settings.appearance == L"bar" || settings.appearance == L"background";
+    colorMenu.Opacity(colorsAvailable ? 1.0 : 0.55);
+    MenuHint(colorMenu,russian,
+        colorsAvailable ? L"Choose colors for free and used space" :
+            L"Colors are available in Color bar and Capacity background themes",
+        colorsAvailable ? L"Выбрать цвета свободного и занятого места" :
+            L"Цвета доступны в темах «Цветная полоса» и «Фон свободного места»");
     for (const auto& theme : themes) {
         MenuFlyoutItem item;
         item.Icon(MenuIcon(L"\uE790"));
         std::wstring label = settings.colorScheme == theme.id ? L"✓ " : L"  ";
         label += russian ? theme.russian : theme.english;
         item.Text(label);
+        MenuHint(item,colorsAvailable ? UiText(russian,L"Free / used colors: ",L"Цвета свободно / занято: ") +
+            std::wstring(russian ? theme.russian : theme.english) :
+            UiText(russian,L"First select Color bar or Capacity background",
+                L"Сначала выберите «Цветная полоса» или «Фон свободного места»"));
         item.Click([id = std::wstring(theme.id)](auto const&, auto const&) {
+            const auto current = CurrentSettings();
+            if (current.appearance != L"bar" && current.appearance != L"background") return;
             Wh_SetStringValue(L"SelectedTheme", id.c_str());
             {
                 std::lock_guard lock(g_settingsMutex);
@@ -1309,6 +1578,8 @@ void ShowThemeMenu() {
     MenuFlyoutSubItem formatMenu;
     formatMenu.Icon(MenuIcon(L"\uE8A5"));
     formatMenu.Text(UiText(russian, L"Format", L"Формат"));
+    MenuHint(formatMenu,russian,L"Choose which capacity values appear on the taskbar",
+        L"Выбрать данные о месте, которые отображаются на панели");
     constexpr ThemeOption formats[] = {
         {L"free", L"Free / Total", L"Свободно / Всего"},
         {L"used", L"Used / Total", L"Занято / Всего"},
@@ -1320,6 +1591,12 @@ void ShowThemeMenu() {
         std::wstring label = settings.format == format.id ? L"✓ " : L"  ";
         label += russian ? format.russian : format.english;
         item.Text(label);
+        const std::wstring formatId = format.id;
+        MenuHint(item,russian,
+            formatId == L"free" ? L"Available and total capacity in GiB" :
+            formatId == L"used" ? L"Used and total capacity in GiB" : L"Available space as a percentage of total capacity",
+            formatId == L"free" ? L"Свободный и общий объём в ГиБ" :
+            formatId == L"used" ? L"Занятый и общий объём в ГиБ" : L"Свободное место в процентах от общего объёма");
         item.Click([id = std::wstring(format.id)](auto const&, auto const&) {
             Wh_SetStringValue(L"SelectedFormat", id.c_str());
             {
@@ -1334,6 +1611,8 @@ void ShowThemeMenu() {
     MenuFlyoutSubItem precisionMenu;
     precisionMenu.Icon(MenuIcon(L"\uE8EF"));
     precisionMenu.Text(UiText(russian, L"Precision", L"Точность"));
+    MenuHint(precisionMenu,russian,L"Choose decimal places for capacity and percentages",
+        L"Выбрать число знаков после запятой для объёма и процентов");
     constexpr PCWSTR russianLabels[] = {L"Без дробной части", L"1 знак после запятой", L"2 знака после запятой"};
     constexpr PCWSTR englishLabels[] = {L"No decimal places", L"1 decimal place", L"2 decimal places"};
     for (int precision = 0; precision <= 2; ++precision) {
@@ -1342,6 +1621,8 @@ void ShowThemeMenu() {
         std::wstring label = settings.precision == precision ? L"✓ " : L"  ";
         label += russian ? russianLabels[precision] : englishLabels[precision];
         item.Text(label);
+        MenuHint(item,UiText(russian,L"Round capacity and percentages to decimal places: ",
+            L"Округлять объём и проценты; знаков после запятой: ")+std::to_wstring(precision));
         item.Click([precision](auto const&, auto const&) {
             Wh_SetStringValue(L"SelectedPrecision", std::to_wstring(precision).c_str());
             {
@@ -1355,10 +1636,17 @@ void ShowThemeMenu() {
     menu.Items().Append(precisionMenu);
     MenuFlyoutSubItem monitorMenu;
     monitorMenu.Text(UiText(russian, L"Monitor", L"Монитор"));
+    MenuHint(monitorMenu,russian,L"Choose the taskbars where the indicator appears",
+        L"Выбрать панели задач, на которых отображается индикатор");
     auto appendMonitor = [&](const std::wstring& id, const std::wstring& label) {
         MenuFlyoutItem item;
         item.Icon(MenuIcon(L"\uE7F4"));
         item.Text((settings.displayOn == id ? L"✓ " : L"  ") + label);
+        MenuHint(item,russian,
+            id == L"primary" ? L"Show only on the primary monitor taskbar" :
+            id == L"all" ? L"Show on every available taskbar" : L"Show only on this monitor taskbar",
+            id == L"primary" ? L"Показывать только на панели основного монитора" :
+            id == L"all" ? L"Показывать на всех доступных панелях задач" : L"Показывать только на панели этого монитора");
         item.Click([id](auto const&, auto const&) {
             Wh_SetStringValue(L"SelectedMonitor", id.c_str());
             {
@@ -1377,6 +1665,8 @@ void ShowThemeMenu() {
     menu.Items().Append(monitorMenu);
     MenuFlyoutSubItem positionMenu;
     positionMenu.Text(UiText(russian, L"Position", L"Положение"));
+    MenuHint(positionMenu,russian,L"Choose the indicator position on the taskbar",
+        L"Выбрать положение индикатора на панели задач");
     constexpr ThemeOption positions[] = {
         {L"auto", L"Automatic", L"Автоматически"},
         {L"left", L"Left", L"Слева"},
@@ -1388,7 +1678,12 @@ void ShowThemeMenu() {
         automatic.Text(UiText(russian, L"Automatic (top)", L"Автоматически (сверху)"));
         automatic.Icon(MenuIcon(L"\uE8A9"));
         automatic.IsChecked(true);
-        automatic.IsEnabled(false);
+        automatic.Opacity(0.55);
+        MenuHint(automatic,russian,L"Vertical taskbars use only the upper free section",
+            L"На вертикальной панели используется только свободный участок сверху");
+        automatic.Click([](auto const& sender, auto const&) {
+            sender.template as<ToggleMenuFlyoutItem>().IsChecked(true);
+        });
         positionMenu.Items().Append(automatic);
     }
     for (const auto& position : positions) {
@@ -1398,6 +1693,12 @@ void ShowThemeMenu() {
         std::wstring label = settings.position == position.id ? L"✓ " : L"  ";
         label += russian ? position.russian : position.english;
         item.Text(label);
+        const std::wstring positionId = position.id;
+        MenuHint(item,russian,
+            positionId == L"auto" ? L"Choose a free section automatically; lists prefer the side fitting more cards" :
+            positionId == L"left" ? L"Use the left taskbar section" : L"Use the right free section before the tray",
+            positionId == L"auto" ? L"Автоматически выбрать свободный участок; для списка — более вместительную сторону" :
+            positionId == L"left" ? L"Использовать левый участок панели задач" : L"Использовать свободный участок справа перед треем");
         item.Click([id = std::wstring(position.id)](auto const&, auto const&) {
             Wh_SetStringValue(L"SelectedPosition", id.c_str());
             {
@@ -1412,10 +1713,14 @@ void ShowThemeMenu() {
     menu.Items().Append(positionMenu);
     MenuFlyoutSubItem miniMenu;
     miniMenu.Icon(MenuIcon(L"\uE8A7"));
-    miniMenu.Text(UiText(russian, L"Mini design", L"Мини дизайн"));
+    miniMenu.Text(UiText(russian, L"Compact mode", L"Компактный режим"));
+    MenuHint(miniMenu,russian,L"Choose compact drive cards or a drive-count button",
+        L"Выбрать компактные карточки дисков или кнопку со счётчиком");
     ToggleMenuFlyoutItem miniItem;
     miniItem.Icon(MenuIcon(L"\uE8A7"));
     miniItem.Text(UiText(russian, L"Hide drive name", L"Скрывать имя диска"));
+    MenuHint(miniItem,russian,L"Hide volume names; keep drive letters and capacity on one line",
+        L"Скрыть имена дисков; оставить буквы и данные о месте в одну строку");
     miniItem.IsChecked(settings.hideDriveName);
     miniItem.Click([](auto const& sender, auto const&) {
         const bool enabled = sender.template as<ToggleMenuFlyoutItem>().IsChecked();
@@ -1429,20 +1734,16 @@ void ShowThemeMenu() {
     miniMenu.Items().Append(miniItem);
     ToggleMenuFlyoutItem autoMiniItem;
     autoMiniItem.Icon(MenuIcon(L"\uE713"));
-    autoMiniItem.Text(UiText(russian, L"Automatic mini design", L"Авто мини дизайн"));
-    autoMiniItem.IsChecked(settings.autoCompact);
-    autoMiniItem.Click([](auto const& sender, auto const&) {
-        const bool enabled = sender.template as<ToggleMenuFlyoutItem>().IsChecked();
-        Wh_SetStringValue(L"SelectedAutoCompact", enabled ? L"1" : L"0");
-        {
-            std::lock_guard lock(g_settingsMutex);
-            g_settings.autoCompact = enabled;
-        }
-        if (g_changed) SetEvent(g_changed);
-    });
+    autoMiniItem.Text(UiText(russian, L"Automatic", L"Автоматически"));
+    MenuHint(autoMiniItem,russian,L"Always enabled: use a smaller design when the selected design cannot fit a drive card",
+        L"Всегда включено: использовать более компактный вид, если карточка выбранного вида не помещается");
+    autoMiniItem.IsChecked(true);
+    autoMiniItem.IsEnabled(false);
     miniMenu.Items().Append(autoMiniItem);
     ToggleMenuFlyoutItem tileItem;
     tileItem.Text(UiText(russian, L"Letters and capacity bar", L"Буквы дисков и полоса"));
+    MenuHint(tileItem,russian,L"Show drive letters on a free/used capacity background",
+        L"Показывать буквы дисков на фоне свободного и занятого места");
     tileItem.Icon(MenuIcon(L"\uE8A7"));
     tileItem.IsChecked(settings.letterTiles);
     tileItem.Click([](auto const& sender, auto const&) {
@@ -1454,6 +1755,8 @@ void ShowThemeMenu() {
     miniMenu.Items().Append(tileItem);
     ToggleMenuFlyoutItem summaryItem;
     summaryItem.Text(UiText(russian, L"Drives · N", L"Диски · N"));
+    MenuHint(summaryItem,russian,L"Replace cards with a drive count; hover for capacity details",
+        L"Заменить карточки счётчиком дисков; данные о месте — при наведении");
     summaryItem.Icon(MenuIcon(L"\uE8A7"));
     summaryItem.IsChecked(settings.summaryButton);
     summaryItem.Click([](auto const& sender, auto const&) {
@@ -1467,12 +1770,19 @@ void ShowThemeMenu() {
     MenuFlyoutSubItem lowSpaceMenu;
     lowSpaceMenu.Icon(MenuIcon(L"\uE7BA"));
     lowSpaceMenu.Text(UiText(russian, L"Low disk space", L"Нехватка места"));
+    MenuHint(lowSpaceMenu,russian,L"Choose when low free space highlights a drive text",
+        L"Выбрать порог свободного места для предупреждения цветом текста");
     auto appendThreshold = [&](const std::wstring& mode, int threshold, const std::wstring& label) {
         MenuFlyoutItem item;
         item.Icon(MenuIcon(L"\uE7BA"));
         const bool selected = settings.lowSpaceMode == mode &&
             (mode == L"off" || settings.lowSpaceThreshold == threshold);
         item.Text((selected ? L"✓ " : L"  ") + label);
+        MenuHint(item,mode == L"off" ? UiText(russian,L"Disable low-space text warnings",
+            L"Не выделять текст при нехватке свободного места") :
+            UiText(russian,L"Highlight a drive when free space is at or below ",
+                L"Выделять текст диска, когда свободно не больше ") + std::to_wstring(threshold) +
+                (mode == L"percent" ? L" %" : russian ? L" ГиБ" : L" GiB"));
         item.Click([mode, threshold](auto const&, auto const&) {
             Wh_SetStringValue(L"SelectedLowSpace", (mode + L":" + std::to_wstring(threshold)).c_str());
             {
@@ -1493,7 +1803,9 @@ void ShowThemeMenu() {
     if (settings.lowSpaceMode != L"off") {
         MenuFlyoutItem current;
         current.Icon(MenuIcon(L"\uE7BA"));
-        current.IsEnabled(false);
+        current.Opacity(0.55);
+        MenuHint(current,russian,L"The saved warning threshold; change it using the options above",
+            L"Сохранённый порог предупреждения; изменить его можно пунктами выше");
         current.Text(UiText(russian, L"Current: ", L"Текущий порог: ") +
             std::to_wstring(settings.lowSpaceThreshold) +
             (settings.lowSpaceMode == L"percent" ? L" %" : (russian ? L" ГиБ" : L" GiB")));
@@ -1503,6 +1815,8 @@ void ShowThemeMenu() {
     menu.Items().Append(MenuFlyoutSeparator());
     MenuFlyoutItem openDriveItem;
     openDriveItem.Text(UiText(russian, L"Open selected drive", L"Открыть выбранный диск"));
+    MenuHint(openDriveItem,russian,L"Open the selected single drive in File Explorer",
+        L"Открыть выбранный одиночный диск в Проводнике");
     openDriveItem.Click([](auto const&, auto const&) {
         const auto drive = NormalizeDrive(CurrentSettings().drive);
         if (drive.empty()) return;
@@ -1517,6 +1831,8 @@ void ShowThemeMenu() {
     menu.Items().Append(openDriveItem);
     MenuFlyoutItem computerItem;
     computerItem.Text(UiText(russian, L"This PC", L"Этот компьютер"));
+    MenuHint(computerItem,russian,L"Open This PC in File Explorer",
+        L"Открыть раздел «Этот компьютер» в Проводнике");
     computerItem.Click([](auto const&, auto const&) {
         wchar_t windowsDirectory[MAX_PATH]{};
         const UINT length = GetWindowsDirectoryW(windowsDirectory, ARRAYSIZE(windowsDirectory));
@@ -1534,6 +1850,8 @@ void ShowThemeMenu() {
     menu.Items().Append(computerItem);
     MenuFlyoutItem diskManagementItem;
     diskManagementItem.Text(UiText(russian, L"Disk Management", L"Управление дисками"));
+    MenuHint(diskManagementItem,russian,L"Open Windows Disk Management with administrator elevation",
+        L"Открыть управление дисками Windows с запросом прав администратора");
     diskManagementItem.Click([](auto const&, auto const&) {
         wchar_t systemDirectory[MAX_PATH]{};
         const UINT length = GetSystemDirectoryW(systemDirectory, ARRAYSIZE(systemDirectory));
@@ -1553,6 +1871,8 @@ void ShowThemeMenu() {
     menu.Items().Append(MenuFlyoutSeparator());
     MenuFlyoutItem refreshItem;
     refreshItem.Text(UiText(russian, L"Refresh now", L"Обновить сейчас"));
+    MenuHint(refreshItem,russian,L"Read current disk space without waiting for the update interval",
+        L"Обновить данные о месте на дисках, не дожидаясь заданного интервала");
     refreshItem.Click([](auto const&, auto const&) {
         // Wake the worker, which resets nextRead and reads volume metadata.
         // Keep disk I/O off the taskbar UI thread.
@@ -1562,11 +1882,15 @@ void ShowThemeMenu() {
     menu.Items().Append(refreshItem);
     MenuFlyoutItem resetItem;
     resetItem.Text(UiText(russian, L"Reset appearance", L"Сбросить оформление"));
+    MenuHint(resetItem,russian,L"Restore default appearance; keep drive, monitor, position and warning threshold",
+        L"Вернуть стандартный вид; сохранить диск, монитор, положение и порог предупреждения");
     resetItem.Icon(MenuIcon(L"\uE777"));
     resetItem.Click([](auto const&, auto const&) { ResetAppearance(); });
     menu.Items().Append(resetItem);
     MenuFlyoutItem configuredItem;
     configuredItem.Text(UiText(russian, L"Apply Windhawk settings", L"Применить настройки Windhawk"));
+    MenuHint(configuredItem,russian,L"Clear saved menu overrides and apply the Windhawk settings page",
+        L"Сбросить сохранённый выбор меню и применить страницу настроек Windhawk");
     configuredItem.Icon(MenuIcon(L"\uE713"));
     configuredItem.Click([](auto const&, auto const&) { ApplyConfiguredSettings(); });
     menu.Items().Append(configuredItem);
@@ -1613,6 +1937,339 @@ ColorPair ColorScheme(const std::wstring& name) {
     return {Color{32, 45, 190, 70}, Color{32, 205, 55, 45}};
 }
 
+StackPanel SummaryTooltipContent(const Reading& reading, const Settings& settings,
+                                 bool russian, bool light, bool highContrast,
+                                 const TooltipLayout& layout, bool overflow) {
+    const auto disks = TooltipDisks(reading, settings.showAllDrives);
+    auto systemColor = [](int index) {
+        const auto rgb = GetSysColor(index);
+        return Color{255, GetRValue(rgb), GetGValue(rgb), GetBValue(rgb)};
+    };
+    const Color primary = highContrast ? systemColor(COLOR_WINDOWTEXT) :
+        light ? Color{255,28,28,28} : Color{255,245,245,245};
+    const Color secondary = highContrast ? primary :
+        light ? Color{255,96,96,96} : Color{255,170,170,170};
+    const Color quiet = highContrast ? systemColor(COLOR_WINDOW) :
+        light ? Color{6,0,0,0} : Color{9,255,255,255};
+    const Color warning = highContrast ? primary :
+        light ? Color{255,175,30,30} : Color{255,255,135,125};
+    auto colors = ColorScheme(settings.colorScheme);
+    colors.free.A = 230;
+    colors.used.A = 140;
+    if (highContrast) {
+        colors.free = systemColor(COLOR_HIGHLIGHT);
+        colors.used = systemColor(COLOR_WINDOW);
+    }
+    auto text = [&](const std::wstring& value, double size, Color color, bool bold = false) {
+        TextBlock label;
+        label.Text(value);
+        label.FontFamily(FontFamily(L"Segoe UI Variable Text"));
+        label.FontSize(size);
+        label.Foreground(SolidColorBrush(color));
+        if (bold) label.FontWeight(winrt::Windows::UI::Text::FontWeights::SemiBold());
+        return label;
+    };
+    StackPanel body;
+    body.Width(layout.width);
+    // A taskbar ToolTip is informational. ScrollViewer introduces focus/input
+    // machinery into a popup that the shell unloads between pointer hovers.
+    body.IsHitTestVisible(false);
+    Grid header;
+    for (const auto unit : {GridUnitType::Star, GridUnitType::Auto}) {
+        ColumnDefinition column;
+        column.Width(GridLength{1.0,unit});
+        header.ColumnDefinitions().Append(column);
+    }
+    StackPanel heading;
+    heading.Children().Append(text(overflow ?
+        UiText(russian,L"Hidden drives",L"Диски вне панели") :
+        UiText(russian,L"Disk space",L"Место на дисках"),16,primary,true));
+    const auto group = !settings.showAllDrives ? UiText(russian,L"Selected drive",L"Выбранный диск") :
+        settings.driveGroup == L"local" ? UiText(russian,L"Local drives",L"Локальные диски") :
+        settings.driveGroup == L"external" ? UiText(russian,L"External drives",L"Внешние диски") :
+        settings.driveGroup == L"manual" ? UiText(russian,L"Selected drives",L"Выбранные диски") :
+        UiText(russian,L"All drives",L"Все диски");
+    auto subtitle = text(group,11,secondary);
+    subtitle.Margin(Thickness{0,3,0,0});
+    heading.Children().Append(subtitle);
+    header.Children().Append(heading);
+    Border count;
+    count.MinWidth(30);
+    count.Height(28);
+    count.Padding(Thickness{8,0,8,0});
+    count.CornerRadius(CornerRadius{7});
+    count.Background(SolidColorBrush(quiet));
+    count.VerticalAlignment(VerticalAlignment::Center);
+    auto number = text(std::to_wstring(disks.size()),13,primary,true);
+    number.VerticalAlignment(VerticalAlignment::Center);
+    number.TextAlignment(TextAlignment::Center);
+    count.Child(number);
+    Grid::SetColumn(count,1);
+    header.Children().Append(count);
+    body.Children().Append(header);
+    Border divider;
+    divider.Height(1);
+    divider.Margin(Thickness{0,10,0,10});
+    divider.Background(SolidColorBrush(highContrast ? primary :
+        light ? Color{24,0,0,0} : Color{28,255,255,255}));
+    body.Children().Append(divider);
+    Grid rows;
+    for (size_t column = 0; column < layout.columns; ++column) {
+        ColumnDefinition definition;
+        definition.Width(GridLength{1,GridUnitType::Star});
+        rows.ColumnDefinitions().Append(definition);
+    }
+    for (size_t row = 0; row < layout.rows; ++row) {
+        RowDefinition definition;
+        definition.Height(GridLength{1,GridUnitType::Auto});
+        rows.RowDefinitions().Append(definition);
+    }
+    for (size_t index = 0; index < layout.visible; ++index) {
+        const auto& disk = disks[index];
+        const auto foreground = disk.lowSpace ? warning : primary;
+        Border card;
+        card.CornerRadius(CornerRadius{8});
+        card.Padding(Thickness{10,9,10,9});
+        card.Margin(Thickness{index / layout.rows ? 8.0 : 0.0,0,0,
+            index % layout.rows + 1 < layout.rows && index + 1 < layout.visible ? 7.0 : 0.0});
+        Grid::SetColumn(card,static_cast<int>(index/layout.rows));
+        Grid::SetRow(card,static_cast<int>(index%layout.rows));
+        card.Background(SolidColorBrush(quiet));
+        if (highContrast) {
+            card.BorderThickness(Thickness{1});
+            card.BorderBrush(SolidColorBrush(primary));
+        }
+        StackPanel contents;
+        Grid details;
+        for (const auto length : {GridLength{44,GridUnitType::Pixel},
+                                 GridLength{1,GridUnitType::Star},
+                                 GridLength{64,GridUnitType::Pixel}}) {
+            ColumnDefinition column;
+            column.Width(length);
+            details.ColumnDefinitions().Append(column);
+        }
+        Border badge;
+        badge.Width(34);
+        badge.Height(34);
+        badge.HorizontalAlignment(HorizontalAlignment::Left);
+        badge.VerticalAlignment(VerticalAlignment::Top);
+        badge.CornerRadius(CornerRadius{7});
+        auto badgeColor = colors.free;
+        badgeColor.A = highContrast ? 0 : 26;
+        badge.Background(SolidColorBrush(badgeColor));
+        if (highContrast) {
+            badge.BorderBrush(SolidColorBrush(primary));
+            badge.BorderThickness(Thickness{1});
+        }
+        auto letter = text(disk.letter,12,primary,true);
+        letter.VerticalAlignment(VerticalAlignment::Center);
+        letter.TextAlignment(TextAlignment::Center);
+        badge.Child(letter);
+        details.Children().Append(badge);
+        StackPanel labels;
+        labels.Margin(Thickness{0,0,8,0});
+        auto name = text(disk.name.empty() ? UiText(russian,L"Drive",L"Диск") : disk.name,12,foreground,true);
+        name.TextWrapping(TextWrapping::Wrap);
+        name.TextTrimming(TextTrimming::CharacterEllipsis);
+        name.MaxLines(2);
+        labels.Children().Append(name);
+        auto capacity = text(disk.capacity,11,disk.lowSpace ? warning : secondary);
+        capacity.Margin(Thickness{0,3,0,0});
+        capacity.TextWrapping(TextWrapping::Wrap);
+        capacity.TextTrimming(TextTrimming::CharacterEllipsis);
+        capacity.MaxLines(2);
+        labels.Children().Append(capacity);
+        Grid::SetColumn(labels,1);
+        details.Children().Append(labels);
+        StackPanel percentage;
+        auto percent = text(disk.hasRatio ? FormatGiB(disk.freeRatio * 100.0,russian,settings.precision) + L" %" : L"—",
+                            13,foreground,true);
+        percent.TextAlignment(TextAlignment::Right);
+        percentage.Children().Append(percent);
+        auto caption = text(UiText(russian,L"free",L"свободно"),10,secondary);
+        caption.TextAlignment(TextAlignment::Right);
+        caption.Margin(Thickness{0,3,0,0});
+        percentage.Children().Append(caption);
+        Grid::SetColumn(percentage,2);
+        details.Children().Append(percentage);
+        contents.Children().Append(details);
+        if (disk.hasRatio) {
+            LinearGradientBrush fill;
+            fill.StartPoint({0,0.5}); fill.EndPoint({1,0.5});
+            for (int i = 0; i < 4; ++i) {
+                GradientStop stop;
+                stop.Color(i < 2 ? colors.free : colors.used);
+                stop.Offset(i == 0 ? 0 : i == 3 ? 1 : disk.freeRatio);
+                fill.GradientStops().Append(stop);
+            }
+            Border bar;
+            bar.Height(highContrast ? 6 : 4);
+            bar.Margin(Thickness{0,8,0,0});
+            bar.CornerRadius(CornerRadius{2});
+            bar.Background(fill);
+            if (highContrast) {
+                bar.BorderThickness(Thickness{1});
+                bar.BorderBrush(SolidColorBrush(primary));
+            }
+            contents.Children().Append(bar);
+        }
+        card.Child(contents);
+        Automation::AutomationProperties::SetName(card,
+            disk.letter + L". " + disk.name + L". " + disk.capacity);
+        rows.Children().Append(card);
+    }
+    if (disks.empty()) {
+        auto empty = text(reading.title + L"\n" + reading.capacity,12,secondary);
+        empty.TextWrapping(TextWrapping::Wrap);
+        rows.Children().Append(empty);
+    }
+    body.Children().Append(rows);
+    if (layout.visible < disks.size()) {
+        auto overflow = text(UiText(russian,L"More drives: ",L"Ещё дисков: ") +
+            std::to_wstring(disks.size()-layout.visible) +
+            UiText(russian,L" · Open the drive menu",L" · Откройте меню выбора"),11,secondary);
+        overflow.Margin(Thickness{0,8,0,0});
+        overflow.TextWrapping(TextWrapping::Wrap);
+        body.Children().Append(overflow);
+    }
+    StackPanel legend;
+    legend.Orientation(Orientation::Horizontal);
+    legend.Margin(Thickness{0,10,0,0});
+    auto swatch = [&](const std::wstring& caption, Color color) {
+        StackPanel item;
+        item.Orientation(Orientation::Horizontal);
+        item.Margin(Thickness{0,0,16,0});
+        Border dot;
+        dot.Width(7); dot.Height(7);
+        dot.CornerRadius(CornerRadius{4});
+        dot.VerticalAlignment(VerticalAlignment::Center);
+        dot.Margin(Thickness{0,0,5,0});
+        dot.Background(SolidColorBrush(color));
+        if (highContrast) {
+            dot.BorderBrush(SolidColorBrush(primary));
+            dot.BorderThickness(Thickness{1});
+        }
+        item.Children().Append(dot);
+        item.Children().Append(text(caption,10,secondary));
+        return item;
+    };
+    legend.Children().Append(swatch(UiText(russian,L"Free",L"Свободно"),colors.free));
+    legend.Children().Append(swatch(UiText(russian,L"Used",L"Занято"),colors.used));
+    legend.Visibility(disks.empty() ? Visibility::Collapsed : Visibility::Visible);
+    body.Children().Append(legend);
+    return body;
+}
+
+void ClearCapacityTooltip() {
+    if (g_ui.summaryTip) {
+        g_ui.summaryTip.IsOpen(false);
+        if (g_ui.tooltipOwner) ToolTipService::SetToolTip(g_ui.tooltipOwner,nullptr);
+        g_ui.summaryTip = nullptr;
+    }
+    g_ui.tooltipOwner = nullptr;
+    g_ui.tooltipSignature.clear();
+}
+
+void UpdateSummaryTooltip(HWND window, const Settings& settings, const Reading& reading,
+                          bool vertical) {
+    const bool overflow = !g_ui.summary && g_ui.hiddenDrives > 0;
+    FrameworkElement owner = g_ui.summary ? g_ui.surface.as<FrameworkElement>() :
+        overflow ? g_ui.overflowSurface.as<FrameworkElement>() : nullptr;
+    if (g_ui.tooltipOwner != owner || !owner) {
+        ClearCapacityTooltip();
+        g_ui.tooltipOwner = owner;
+    }
+    if (!owner) return;
+    const auto hidden = overflow ? HiddenDriveReading(reading,g_ui.visibleDrives) : Reading{};
+    const auto& tooltipReading = overflow ? hidden : reading;
+    MONITORINFO monitor{sizeof(monitor)};
+    const bool hasMonitor = GetMonitorInfoW(MonitorFromWindow(window,MONITOR_DEFAULTTONEAREST),&monitor) != FALSE;
+    const double scale = std::max(96U,GetDpiForWindow(window)) / 96.0;
+    const double workWidth = hasMonitor ? (monitor.rcWork.right-monitor.rcWork.left)/scale : 800;
+    const double workHeight = hasMonitor ? (monitor.rcWork.bottom-monitor.rcWork.top)/scale : 600;
+    const auto disks = TooltipDisks(tooltipReading,settings.showAllDrives);
+    const auto layout = PassiveTooltipLayout(disks.size(),workWidth,workHeight);
+    const double width = layout.width+30.0;
+    HIGHCONTRASTW contrast{sizeof(contrast)};
+    SystemParametersInfoW(SPI_GETHIGHCONTRAST,sizeof(contrast),&contrast,0);
+    const bool highContrast = (contrast.dwFlags & HCF_HIGHCONTRASTON) != 0;
+    const bool light = g_ui.surface.ActualTheme() == ElementTheme::Light;
+    const bool russian = IsRussianUi();
+    std::wstring signature = DriveTooltip(tooltipReading) + L"|" + std::to_wstring(overflow) +
+        L"|" + settings.driveGroup + L"|" +
+        settings.colorScheme + L"|" + std::to_wstring(settings.showAllDrives) +
+        std::to_wstring(settings.precision) + std::to_wstring(russian) +
+        std::to_wstring(light) + std::to_wstring(highContrast) +
+        L"|" + std::to_wstring(width) + L"|" + std::to_wstring(layout.rows) +
+        L"|" + std::to_wstring(layout.columns) + L"|" + std::to_wstring(layout.visible);
+    for (const auto& disk : disks)
+        signature += L"|" + disk.letter + L"|" + std::to_wstring(disk.freeRatio) +
+            std::to_wstring(disk.hasRatio) + std::to_wstring(disk.lowSpace);
+    if (!g_ui.summaryTip) {
+        g_ui.summaryTip = ToolTip();
+        g_ui.summaryTip.Padding(Thickness{14,12,14,12});
+        g_ui.summaryTip.BorderThickness(Thickness{1});
+        g_ui.summaryTip.CornerRadius(CornerRadius{12});
+        g_ui.summaryTip.IsHitTestVisible(false);
+        g_ui.summaryTip.XamlRoot(owner.XamlRoot());
+        g_ui.summaryTip.PlacementTarget(owner);
+    }
+    // Never replace a live popup's content or change its XamlRoot while the
+    // framework is processing hover/close input. Refresh on the next closed probe.
+    const bool open = g_ui.summaryTip.IsOpen();
+    if (!open && signature != g_ui.tooltipSignature) {
+        g_ui.summaryTip.RequestedTheme(light ? ElementTheme::Light : ElementTheme::Dark);
+        const auto backgroundRgb = highContrast ? GetSysColor(COLOR_WINDOW) :
+            light ? RGB(250,250,250) : RGB(32,32,32);
+        const auto borderRgb = highContrast ? GetSysColor(COLOR_WINDOWTEXT) :
+            light ? RGB(216,216,216) : RGB(64,64,64);
+        g_ui.summaryTip.Background(SolidColorBrush(Color{255,GetRValue(backgroundRgb),GetGValue(backgroundRgb),GetBValue(backgroundRgb)}));
+        g_ui.summaryTip.BorderBrush(SolidColorBrush(Color{255,GetRValue(borderRgb),GetGValue(borderRgb),GetBValue(borderRgb)}));
+        g_ui.summaryTip.Width(width);
+        g_ui.summaryTip.MaxWidth(width);
+        g_ui.summaryTip.Content(SummaryTooltipContent(tooltipReading,settings,russian,light,highContrast,layout,overflow));
+        Automation::AutomationProperties::SetName(g_ui.summaryTip,DriveTooltip(tooltipReading));
+        g_ui.tooltipSignature = std::move(signature);
+        if (ToolTipService::GetToolTip(owner) != g_ui.summaryTip)
+            ToolTipService::SetToolTip(owner,g_ui.summaryTip);
+    }
+    using winrt::Windows::UI::Xaml::Controls::Primitives::PlacementMode;
+    RECT taskbar{};
+    GetWindowRect(window,&taskbar);
+    const bool firstEdge = hasMonitor && (vertical ?
+        std::abs(taskbar.left-monitor.rcMonitor.left) <= std::abs(taskbar.right-monitor.rcMonitor.right) :
+        std::abs(taskbar.top-monitor.rcMonitor.top) <= std::abs(taskbar.bottom-monitor.rcMonitor.bottom));
+    const auto placement = vertical ? (firstEdge ? PlacementMode::Right : PlacementMode::Left) :
+        firstEdge ? PlacementMode::Bottom : PlacementMode::Top;
+    if (!open && g_ui.summaryTip.Placement() != placement) g_ui.summaryTip.Placement(placement);
+}
+
+Color NeutralHoverColor(bool light) {
+    HIGHCONTRASTW contrast{sizeof(contrast)};
+    SystemParametersInfoW(SPI_GETHIGHCONTRAST, sizeof(contrast), &contrast, 0);
+    if (contrast.dwFlags & HCF_HIGHCONTRASTON) {
+        const COLORREF highlight = GetSysColor(COLOR_HIGHLIGHT);
+        return Color{110, GetRValue(highlight), GetGValue(highlight), GetBValue(highlight)};
+    }
+    if (auto border = g_ui.startBackground.try_as<Border>()) {
+        if (auto brush = border.Background().try_as<SolidColorBrush>()) {
+            auto color = brush.Color();
+            color.A = EffectiveBrushAlpha(color.A, brush.Opacity() * border.Opacity());
+            if (color.A && color.A < 255) return color;
+        }
+    }
+    try {
+        auto resource = Application::Current().Resources().Lookup(
+            winrt::box_value(L"SystemControlHighlightListLowBrush"));
+        if (auto brush = resource.try_as<SolidColorBrush>()) {
+            auto color = brush.Color();
+            color.A = EffectiveBrushAlpha(color.A, brush.Opacity());
+            if (color.A && color.A < 255) return color;
+        }
+    } catch (...) {}
+    return light ? Color{16, 0, 0, 0} : Color{16, 255, 255, 255};
+}
+
 void ApplyHoverBackground() {
     if (!g_ui.surface) return;
     const bool light = g_ui.surface.ActualTheme() == ElementTheme::Light;
@@ -1626,32 +2283,9 @@ void ApplyHoverBackground() {
             const ColorPair pair = ColorScheme(g_ui.colorScheme);
             freeColor = pair.free;
             usedColor = pair.used;
+            freeColor.A = usedColor.A = NeutralHoverColor(light).A;
         } else {
-            // Match the quiet neutral hover surface used by taskbar buttons
-            // when disk capacity is unavailable.
-            Color color{};
-            HIGHCONTRASTW contrast{sizeof(contrast)};
-            SystemParametersInfoW(SPI_GETHIGHCONTRAST, sizeof(contrast), &contrast, 0);
-            if (contrast.dwFlags & HCF_HIGHCONTRASTON) {
-                const COLORREF highlight = GetSysColor(COLOR_HIGHLIGHT);
-                color = Color{110, GetRValue(highlight), GetGValue(highlight),
-                               GetBValue(highlight)};
-            } else {
-                bool resourceColor = false;
-                try {
-                    auto resource = Application::Current().Resources().Lookup(
-                        winrt::box_value(L"SystemControlHighlightListLowBrush"));
-                    if (auto brush = resource.try_as<SolidColorBrush>()) {
-                        color = brush.Color();
-                        resourceColor = true;
-                    }
-                } catch (...) {
-                    // Older taskbar builds may not expose this WinUI resource.
-                }
-                if (!resourceColor) {
-                    color = light ? Color{24, 0, 0, 0} : Color{32, 255, 255, 255};
-                }
-            }
+            const Color color = NeutralHoverColor(light);
             freeColor = color;
             usedColor = color;
         }
@@ -1675,7 +2309,9 @@ void ApplyHoverBackground() {
     const double ratio = std::clamp(g_ui.freeRatio, 0.0, 1.0);
     g_ui.freeEndStop.Offset(ratio);
     g_ui.usedStartStop.Offset(ratio);
-    if (g_ui.appearance == L"text" || (!g_ui.hovered && !g_ui.pressed)) {
+    if (g_ui.appearance == L"text" ||
+        (!g_ui.driveCells.empty() && !g_ui.summary) ||
+        (!g_ui.hovered && !g_ui.pressed)) {
         freeColor.A = 0;
         usedColor.A = 0;
     } else if (g_ui.pressed) {
@@ -1981,6 +2617,62 @@ LayoutChoice ChooseHorizontalLayout(const HorizontalGaps& gaps, bool automatic,
     return {};
 }
 
+struct DrivePrefixFit { size_t visible = 0; double width = 0; };
+
+DrivePrefixFit FitDrivePrefix(const std::vector<double>& cells,
+                             const std::vector<double>& overflowWidths,
+                             double available, size_t previous = SIZE_MAX) {
+    if (!std::isfinite(available) || available <= 0 || cells.empty() ||
+        overflowWidths.size() <= cells.size()) return {};
+    std::vector<double> prefix(cells.size()+1,0);
+    for (size_t i = 0; i < cells.size(); ++i) {
+        if (!std::isfinite(cells[i]) || cells[i] <= 0) return {};
+        prefix[i+1] = prefix[i] + cells[i] + (i ? 12.0 : 0.0);
+    }
+    for (size_t count = cells.size(); count > 0; --count) {
+        const size_t hidden = cells.size()-count;
+        const double overflow = hidden ? overflowWidths[hidden] : 0;
+        if (!std::isfinite(overflow) || (hidden && overflow <= 0)) continue;
+        const double width = 16.0 + prefix[count] + (hidden ? 12.0+overflow : 0.0);
+        // Shrink immediately; require 8 spare DIPs before restoring another card.
+        const double headroom = previous != SIZE_MAX && count > previous ? 8.0 : 0.0;
+        if (width+headroom <= available) return {count,width};
+    }
+    return {};
+}
+
+struct DriveListChoice {
+    int mode = -1;
+    bool right = false;
+    LayoutGap gap;
+    size_t visible = 0;
+    double width = 0;
+};
+
+DriveListChoice ChooseDriveListLayout(const HorizontalGaps& gaps, bool automatic,
+        bool preferRight, bool fixedRight, const std::array<std::vector<double>,3>& cells,
+        const std::vector<double>& overflowWidths, double summaryWidth, int firstMode,
+        bool allowCompact, int previousMode = -1, size_t previousVisible = 0) {
+    for (int mode = firstMode; mode < 3; ++mode) {
+        if (!allowCompact && mode != firstMode) continue;
+        DriveListChoice best;
+        for (int attempt = 0; attempt < (automatic ? 2 : 1); ++attempt) {
+            const bool right = automatic ? (attempt == 0 ? preferRight : !preferRight) : fixedRight;
+            const auto gap = right ? gaps.right : gaps.left;
+            const size_t previous = previousMode >= 0 &&
+                (mode == previousMode || previousMode == 3) ? previousVisible : SIZE_MAX;
+            const auto fit = FitDrivePrefix(cells[mode],overflowWidths,gap.width,previous);
+            if (fit.visible > best.visible) best = {mode,right,gap,fit.visible,fit.width};
+        }
+        // Preserve the selected design. Only compact further if no whole card fits.
+        if (best.visible) return best;
+    }
+    const auto summary = ChooseHorizontalLayout(gaps,automatic,preferRight,fixedRight,
+        {0,0,0,summaryWidth},3,false);
+    if (summary.mode >= 0) return {3,summary.right,summary.gap,0,summaryWidth};
+    return {};
+}
+
 void CollectHorizontalButtons(DependencyObject const& parent, Grid const& root,
                               std::vector<LayoutGap>& occupied, int depth = 0) {
     if (!parent || depth > 24) return;
@@ -2041,31 +2733,50 @@ void ApplyDriveHover(size_t index, bool animate) {
         cell.hover.Opacity(0);
         cell.surface.Background(cell.hover);
     }
-    auto colors = ColorScheme(g_ui.colorScheme);
-    colors.free.A = colors.used.A = 48;
+    const bool capacityBackground = g_ui.appearance == L"background" &&
+        cell.hasRatio && !cell.letterTile && !(contrast.dwFlags & HCF_HIGHCONTRASTON);
+    const Color neutral = NeutralHoverColor(cell.surface.ActualTheme() == ElementTheme::Light);
+    auto highlightColor = neutral;
+    highlightColor.A = EffectiveBrushAlpha(neutral.A, 0.5);
+    cell.highlight.Color(highlightColor);
+    const double highlightTarget = cell.hovered && g_ui.appearance != L"text" &&
+        (capacityBackground || cell.letterTile) && !(contrast.dwFlags & HCF_HIGHCONTRASTON) ? 1.0 : 0.0;
+    auto colors = capacityBackground ? ColorScheme(g_ui.colorScheme) : ColorPair{neutral,neutral};
+    if (capacityBackground) colors.free.A = colors.used.A = neutral.A;
     for (int i = 0; i < 4; ++i) {
         auto stop = cell.hover.GradientStops().GetAt(i);
         stop.Color(i < 2 ? colors.free : colors.used);
         stop.Offset(i == 0 ? 0 : i == 3 ? 1 : cell.freeRatio);
     }
-    if (!animate && cell.animation && cell.hoverTarget == target) return;
+    if (!animate && cell.animation && cell.hoverTarget == target &&
+        cell.highlightTarget == highlightTarget) return;
     const double current = cell.hover.Opacity();
+    const double currentHighlight = cell.highlight.Opacity();
     if (cell.animation) { cell.animation.Stop(); cell.animation = nullptr; }
     cell.hoverTarget = target;
+    cell.highlightTarget = highlightTarget;
     BOOL animations = TRUE;
     SystemParametersInfoW(SPI_GETCLIENTAREAANIMATION,0,&animations,0);
-    if (!animate || !animations || std::abs(target-current)<0.01) {
-        cell.hover.Opacity(target); return;
+    if (!animate || !animations ||
+        (std::abs(target-current)<0.01 && std::abs(highlightTarget-currentHighlight)<0.01)) {
+        cell.hover.Opacity(target);
+        cell.highlight.Opacity(highlightTarget);
+        return;
     }
     cell.hover.Opacity(current);
-    DoubleAnimation fade;
-    fade.From(current); fade.To(target);
-    fade.Duration(DurationHelper::FromTimeSpan(std::chrono::milliseconds(120)));
-    fade.EnableDependentAnimation(true);
-    Storyboard::SetTarget(fade,cell.hover);
-    Storyboard::SetTargetProperty(fade,L"Opacity");
+    cell.highlight.Opacity(currentHighlight);
     cell.animation = Storyboard();
-    cell.animation.Children().Append(fade);
+    auto appendFade = [&](Brush const& brush, double from, double to) {
+        DoubleAnimation fade;
+        fade.From(from); fade.To(to);
+        fade.Duration(DurationHelper::FromTimeSpan(std::chrono::milliseconds(120)));
+        fade.EnableDependentAnimation(true);
+        Storyboard::SetTarget(fade,brush);
+        Storyboard::SetTargetProperty(fade,L"Opacity");
+        cell.animation.Children().Append(fade);
+    };
+    appendFade(cell.hover,current,target);
+    appendFade(cell.highlight,currentHighlight,highlightTarget);
     cell.animation.Begin();
 }
 
@@ -2081,6 +2792,12 @@ void ClearDriveCells() {
 }
 
 void RemoveUi() {
+    if (g_ui.summaryTip) {
+        try {
+            g_ui.summaryTip.IsOpen(false);
+            if (g_ui.tooltipOwner) ToolTipService::SetToolTip(g_ui.tooltipOwner,nullptr);
+        } catch (...) { Wh_Log(L"Cannot close disk summary tooltip"); }
+    }
     ClearDriveCells();
     if (g_ui.hoverAnimation) {
         try { g_ui.hoverAnimation.Stop(); } catch (...) {}
@@ -2220,6 +2937,19 @@ bool UpdateUi(HWND window, const Settings& settings, const Reading& reading,
         g_ui.widget.VerticalAlignment(VerticalAlignment::Center);
         g_ui.title = TextBlock();
         g_ui.capacity = TextBlock();
+        g_ui.overflowSurface = Border();
+        g_ui.overflowSurface.CornerRadius(CornerRadius{4});
+        g_ui.overflowSurface.Padding(Thickness{8,4,8,4});
+        g_ui.overflowSurface.Margin(Thickness{12,0,0,0});
+        g_ui.overflowSurface.VerticalAlignment(VerticalAlignment::Center);
+        g_ui.overflowSurface.Background(SolidColorBrush(Color{12,128,128,128}));
+        g_ui.overflowSurface.Visibility(Visibility::Collapsed);
+        g_ui.overflowText = TextBlock();
+        g_ui.overflowText.IsHitTestVisible(false);
+        g_ui.overflowText.FontFamily(FontFamily(L"Segoe UI Variable Text"));
+        g_ui.overflowText.FontSize(12);
+        g_ui.overflowText.FontWeight(winrt::Windows::UI::Text::FontWeights::SemiBold());
+        g_ui.overflowSurface.Child(g_ui.overflowText);
         for (auto text : {g_ui.title, g_ui.capacity}) {
             text.FontFamily(FontFamily(L"Segoe UI Variable Text"));
             text.FontSize(12);
@@ -2303,7 +3033,8 @@ bool UpdateUi(HWND window, const Settings& settings, const Reading& reading,
         g_ui.surface.Child(g_ui.widget);
     }
     if (g_ui.summary || g_ui.driveCells.size() != reading.drives.size() ||
-        (multiple && g_ui.widget.Children().Size() != reading.drives.size())) {
+        (multiple && g_ui.widget.Children().Size() != reading.drives.size()+1)) {
+        if (g_ui.tooltipOwner == g_ui.overflowSurface) ClearCapacityTooltip();
         g_ui.widget.Children().Clear();
         ClearDriveCells();
         g_ui.summary = false;
@@ -2316,7 +3047,16 @@ bool UpdateUi(HWND window, const Settings& settings, const Reading& reading,
                 cell.surface.Background(SolidColorBrush(Color{0,0,0,0}));
                 cell.panel = StackPanel();
                 cell.panel.IsHitTestVisible(false);
-                cell.surface.Child(cell.panel);
+                cell.highlight = SolidColorBrush(Color{0,0,0,0});
+                cell.highlight.Opacity(0);
+                cell.highlightLayer = Border();
+                cell.highlightLayer.IsHitTestVisible(false);
+                cell.highlightLayer.Margin(Thickness{-4,-2,-4,-2});
+                cell.highlightLayer.Background(cell.highlight);
+                Grid cellContent;
+                cellContent.Children().Append(cell.highlightLayer);
+                cellContent.Children().Append(cell.panel);
+                cell.surface.Child(cellContent);
                 cell.entered = cell.surface.PointerEntered([state=&g_ui,i](auto const&, auto const&) {
                     UiScope scope(state);
                     if (i < g_ui.driveCells.size()) { g_ui.driveCells[i].hovered = true; ApplyDriveHover(i,true); }
@@ -2353,6 +3093,7 @@ bool UpdateUi(HWND window, const Settings& settings, const Reading& reading,
                 g_ui.widget.Children().Append(cell.surface);
                 g_ui.driveCells.push_back(std::move(cell));
             }
+            g_ui.widget.Children().Append(g_ui.overflowSurface);
         } else {
             g_ui.widget.Children().Append(g_ui.title);
             g_ui.widget.Children().Append(g_ui.capacity);
@@ -2382,6 +3123,7 @@ bool UpdateUi(HWND window, const Settings& settings, const Reading& reading,
             hoverHeight = startButton.ActualHeight();
         }
     }
+    g_ui.surface.MinHeight(hoverHeight);
     if (vertical) {
         g_ui.surface.Height(std::numeric_limits<double>::quiet_NaN());
         g_ui.surface.Padding(Thickness{4,3,4,3});
@@ -2391,6 +3133,19 @@ bool UpdateUi(HWND window, const Settings& settings, const Reading& reading,
         g_ui.surface.Padding(Thickness{8,2,8,2});
         Grid::SetRowSpan(g_ui.surface, 1);
     }
+    const auto nativeRadius = g_ui.surface.CornerRadius();
+    for (auto& cell : g_ui.driveCells) {
+        cell.surface.CornerRadius(nativeRadius);
+        cell.highlightLayer.CornerRadius(nativeRadius);
+        cell.surface.Height(vertical ? std::numeric_limits<double>::quiet_NaN() : hoverHeight);
+        cell.surface.MinHeight(hoverHeight);
+        cell.panel.VerticalAlignment(VerticalAlignment::Center);
+    }
+    g_ui.overflowSurface.CornerRadius(nativeRadius);
+    g_ui.overflowSurface.Height(hoverHeight);
+    g_ui.overflowText.VerticalAlignment(VerticalAlignment::Center);
+    auto overflowColor = NeutralHoverColor(g_ui.surface.ActualTheme() == ElementTheme::Light);
+    g_ui.overflowSurface.Background(SolidColorBrush(overflowColor));
     for (auto text : {g_ui.title, g_ui.capacity}) {
         text.FontSize(vertical ? 11 : 12);
         text.TextAlignment(vertical ? TextAlignment::Center : TextAlignment::Left);
@@ -2482,6 +3237,7 @@ bool UpdateUi(HWND window, const Settings& settings, const Reading& reading,
     auto setLayout = [&](int mode) {
         const bool compact = mode == 1;
         const bool tiles = mode == 2;
+        if (!vertical) g_ui.surface.Height(hoverHeight + (multiple ? 4.0 : 0.0));
         g_ui.widget.MinWidth(0);
         g_ui.widget.Background(nullptr);
         g_ui.title.TextAlignment(TextAlignment::Left);
@@ -2492,7 +3248,7 @@ bool UpdateUi(HWND window, const Settings& settings, const Reading& reading,
             if (!disk.hasRatio || (contrast.dwFlags & HCF_HIGHCONTRASTON)) return nullptr;
             const auto colors = ColorScheme(settings.colorScheme);
             Color free = colors.free, used = colors.used;
-            free.A = used.A = 72;
+            free.A = used.A = NeutralHoverColor(g_ui.surface.ActualTheme() == ElementTheme::Light).A;
             LinearGradientBrush brush;
             brush.StartPoint({0,0.5}); brush.EndPoint({1,0.5});
             for (int i = 0; i < 4; ++i) {
@@ -2524,6 +3280,7 @@ bool UpdateUi(HWND window, const Settings& settings, const Reading& reading,
             for (size_t i = 0; i < g_ui.driveCells.size(); ++i) {
                 auto& cell = g_ui.driveCells[i];
                 const auto& disk = reading.drives[i];
+                cell.surface.Visibility(Visibility::Visible);
                 cell.letterTile = tiles;
                 cell.surface.Margin(vertical ? Thickness{0, i ? 8.0 : 0.0, 0, 0} :
                     Thickness{i ? 12.0 : 0.0, 0, 0, 0});
@@ -2563,6 +3320,8 @@ bool UpdateUi(HWND window, const Settings& settings, const Reading& reading,
     const auto count = settings.showAllDrives ? reading.drives.size() : 1;
     const auto summaryText = UiText(IsRussianUi(), L"Drives · ", L"Диски · ") + std::to_wstring(count);
     auto setSummary = [&] {
+        if (!vertical) g_ui.surface.Height(hoverHeight);
+        if (g_ui.tooltipOwner == g_ui.overflowSurface) ClearCapacityTooltip();
         g_ui.widget.Children().Clear();
         g_ui.widget.Children().Append(g_ui.title);
         g_ui.widget.Background(nullptr);
@@ -2573,6 +3332,8 @@ bool UpdateUi(HWND window, const Settings& settings, const Reading& reading,
         g_ui.summary = true;
     };
     int layoutMode = settings.summaryButton ? 3 : settings.letterTiles ? 2 : settings.hideDriveName ? 1 : 0;
+    g_ui.hiddenDrives = 0;
+    std::array<std::vector<double>,3> measuredCells;
     std::array<double,4> measured{};
     const winrt::Windows::Foundation::Size unlimited{
         std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity()};
@@ -2581,6 +3342,18 @@ bool UpdateUi(HWND window, const Settings& settings, const Reading& reading,
             setLayout(mode);
             g_ui.surface.Measure(unlimited);
             measured[mode] = g_ui.surface.DesiredSize().Width;
+            for (auto& cell : g_ui.driveCells) {
+                cell.surface.Measure(unlimited);
+                const auto margin = cell.surface.Margin();
+                measuredCells[mode].push_back(cell.surface.DesiredSize().Width-margin.Left-margin.Right);
+            }
+            if (multiple) {
+                // Do not collapse the tooltip's owner just to measure an all-drive view.
+                // The live overflow popup stays attached throughout a layout probe.
+                measured[mode] = 16.0;
+                for (size_t i = 0; i < measuredCells[mode].size(); ++i)
+                    measured[mode] += measuredCells[mode][i] + (i ? 12.0 : 0.0);
+            }
         }
         TextBlock summaryMeasure;
         summaryMeasure.FontFamily(g_ui.title.FontFamily());
@@ -2589,18 +3362,74 @@ bool UpdateUi(HWND window, const Settings& settings, const Reading& reading,
         summaryMeasure.Text(summaryText);
         summaryMeasure.Measure(unlimited);
         measured[3] = summaryMeasure.DesiredSize().Width + 16.0;
-        auto choice = ChooseHorizontalLayout(horizontalGaps, settings.position == L"auto",
-            TaskbarIconsLeftAligned(), settings.position == L"right", measured, layoutMode, settings.autoCompact);
+        double chosenWidth = 0;
+        size_t visible = count;
+        LayoutChoice choice;
+        if (multiple) {
+            std::vector<double> overflowWidths(count+1,0);
+            TextBlock moreMeasure;
+            moreMeasure.FontFamily(g_ui.overflowText.FontFamily());
+            moreMeasure.FontSize(g_ui.overflowText.FontSize());
+            moreMeasure.FontWeight(g_ui.overflowText.FontWeight());
+            for (size_t hidden = 1; hidden <= count; ++hidden) {
+                moreMeasure.Text(UiText(IsRussianUi(),L"More · ",L"Ещё · ")+std::to_wstring(hidden));
+                moreMeasure.Measure(unlimited);
+                overflowWidths[hidden] = moreMeasure.DesiredSize().Width+16.0;
+            }
+            std::wstring key = settings.position + L"|" + settings.driveGroup + L"|" +
+                settings.format + L"|" + std::to_wstring(settings.precision) + L"|" +
+                std::to_wstring(layoutMode) + std::to_wstring(settings.autoCompact) + L"|" +
+                std::to_wstring(GetDpiForWindow(window));
+            for (const auto& disk : reading.drives) key += L"|" + disk.title;
+            const auto list = ChooseDriveListLayout(horizontalGaps,settings.position == L"auto",
+                TaskbarIconsLeftAligned(),settings.position == L"right",measuredCells,overflowWidths,
+                measured[3],layoutMode,settings.autoCompact,
+                key == g_ui.listLayoutSignature ? g_ui.listLayoutMode : -1,
+                g_ui.visibleDrives);
+            choice = {list.mode,list.right,list.gap};
+            chosenWidth = list.width;
+            visible = list.visible;
+            g_ui.listLayoutSignature = std::move(key);
+            g_ui.listLayoutMode = list.mode;
+        } else {
+            choice = ChooseHorizontalLayout(horizontalGaps,settings.position == L"auto",
+                TaskbarIconsLeftAligned(),settings.position == L"right",measured,layoutMode,settings.autoCompact);
+            if (choice.mode >= 0) chosenWidth = measured[choice.mode];
+            g_ui.listLayoutMode = -1;
+            g_ui.listLayoutSignature.clear();
+        }
+        if (choice.mode == 3) visible = 0;
+        g_ui.visibleDrives = visible;
         fits = choice.mode >= 0;
         if (fits) {
             layoutMode = choice.mode; placedRight = choice.right;
             maxWidth = choice.gap.width; inset = choice.gap.left;
-            if (placedRight) inset += maxWidth - measured[layoutMode];
+            if (placedRight) inset += maxWidth - chosenWidth;
             if (settings.position == L"auto" && !placedRight)
                 inset = std::clamp(static_cast<double>(settings.offset), inset,
-                                   inset + maxWidth - measured[layoutMode]);
+                                   inset + maxWidth - chosenWidth);
             if (layoutMode == 3) setSummary();
-            else setLayout(layoutMode);
+            else {
+                setLayout(layoutMode);
+                if (multiple) {
+                    g_ui.hiddenDrives = count-visible;
+                    for (size_t i = visible; i < g_ui.driveCells.size(); ++i) {
+                        g_ui.driveCells[i].hovered = false;
+                        g_ui.driveCells[i].surface.Visibility(Visibility::Collapsed);
+                    }
+                    if (g_ui.hiddenDrives) {
+                        g_ui.overflowText.Text(UiText(IsRussianUi(),L"More · ",L"Ещё · ")+
+                            std::to_wstring(g_ui.hiddenDrives));
+                        g_ui.overflowSurface.Visibility(Visibility::Visible);
+                        Automation::AutomationProperties::SetName(g_ui.overflowSurface,
+                            UiText(IsRussianUi(),L"Hidden drives: ",L"Диски вне панели: ")+
+                            std::to_wstring(g_ui.hiddenDrives));
+                        Automation::AutomationProperties::SetHelpText(g_ui.overflowSurface,
+                            UiText(IsRussianUi(),L"Hover for disk space; click to open the drive menu",
+                                L"Наведите для просмотра места; нажмите для открытия меню дисков"));
+                    }
+                }
+            }
             maxWidth = choice.gap.left + choice.gap.width - inset;
         } else { maxWidth = 0; if (layoutMode == 3) setSummary(); else setLayout(layoutMode); }
         LogTaskbarLayout(window, settings, fits ? L"layout-visible" : L"layout-hidden-no-space",
@@ -2612,11 +3441,21 @@ bool UpdateUi(HWND window, const Settings& settings, const Reading& reading,
             L" compact=" + std::to_wstring(measured[1]) + L" tiles=" + std::to_wstring(measured[2]) +
             L" summary=" + std::to_wstring(measured[3]) +
             L" chosen=" + std::to_wstring(fits ? layoutMode : -1) +
+            L" visible=" + std::to_wstring(fits ? visible : 0) +
+            L" hidden=" + std::to_wstring(fits ? count-visible : count) +
+            L" chosen-width=" + std::to_wstring(chosenWidth) +
             L" side=" + (placedRight ? std::wstring(L"right") : std::wstring(L"left")) +
             L" buttons=" + std::to_wstring(buttons.left) + L".." + std::to_wstring(buttons.right));
     } else {
+        g_ui.listLayoutMode = -1;
+        g_ui.listLayoutSignature.clear();
+        g_ui.visibleDrives = count;
         if (layoutMode == 3) setSummary(); else setLayout(layoutMode);
         fits = buttons.found && maxWidth >= 28.0 && verticalGap.height >= 100.0;
+    }
+    if (!g_ui.hiddenDrives) {
+        if (g_ui.tooltipOwner == g_ui.overflowSurface) ClearCapacityTooltip();
+        g_ui.overflowSurface.Visibility(Visibility::Collapsed);
     }
     g_ui.surface.MaxWidth(maxWidth);
     if (multiple && vertical && !g_ui.summary && std::isfinite(maxWidth)) {
@@ -2660,11 +3499,7 @@ bool UpdateUi(HWND window, const Settings& settings, const Reading& reading,
     if (g_ui.surface.Margin() != placement) g_ui.surface.Margin(placement);
     g_ui.freeRatio = reading.freeRatio;
     g_ui.hasRatio = reading.hasRatio;
-    const auto tooltip = g_ui.summary ? DriveTooltip(reading) : std::wstring{};
-    if (tooltip != g_ui.tooltipText) {
-        ToolTipService::SetToolTip(g_ui.surface, tooltip.empty() ? nullptr : winrt::box_value(tooltip));
-        g_ui.tooltipText = tooltip;
-    }
+    UpdateSummaryTooltip(window,settings,reading,vertical);
     g_ui.colorScheme = settings.colorScheme;
     g_ui.appearance = settings.appearance;
     ApplyHoverBackground();
@@ -2705,6 +3540,10 @@ bool UpdateUi(HWND window, const Settings& settings, const Reading& reading,
         auto brush = text.Foreground().try_as<SolidColorBrush>();
         if (!brush || brush.Color() != color) text.Foreground(SolidColorBrush(color));
     }
+    // Use the normal foreground for the overflow count, independently of warning drives.
+    const COLORREF overflowRgb = (contrast.dwFlags & HCF_HIGHCONTRASTON) ? GetSysColor(COLOR_WINDOWTEXT) :
+        g_ui.widget.ActualTheme() == ElementTheme::Light ? RGB(24,24,24) : RGB(245,245,245);
+    g_ui.overflowText.Foreground(SolidColorBrush(Color{255,GetRValue(overflowRgb),GetGValue(overflowRgb),GetBValue(overflowRgb)}));
     for (size_t i = 0; i < g_ui.driveCells.size(); ++i) {
         auto& cell = g_ui.driveCells[i];
         const auto& disk = reading.drives[i];

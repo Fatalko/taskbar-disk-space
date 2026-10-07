@@ -1,8 +1,8 @@
 # Taskbar Disk Space — история изменений
 
-**Последняя версия: 0.14.0 · 6 октября 2026**
+**Последняя версия: 0.17.4 · 7 октября 2026**
 
-В этом обновлении — отдельная тема «Фон свободного места» для списка дисков без нижней полосы.
+В этом обновлении — лёгкая подсветка при наведении на цветные карточки дисков.
 
 [Исходник мода](taskbar-disk-space.wh.cpp) · [Установка и описание](README.md) · [Обратная связь](https://github.com/Fatalko/taskbar-disk-space/issues)
 
@@ -10,6 +10,15 @@
 
 ## Навигация
 
+- [0.17.4 — лёгкая подсветка при наведении](#version-0-17-4)
+- [0.17.3 — размеры и прозрачность рамок](#version-0-17-3)
+- [0.17.2 — подсветка отдельного диска](#version-0-17-2)
+- [0.17.1 — компактный режим](#version-0-17-1)
+- [0.17.0 — ручной набор дисков](#version-0-17-0)
+- [0.16.0 — подсказки пунктов меню](#version-0-16-0)
+- [0.15.0 — диски по доступному месту](#version-0-15-0)
+- [0.14.2 — повторное открытие карточки](#version-0-14-2)
+- [0.14.1 — оформление всплывающей карточки](#version-0-14-1)
 - [0.14.0 — тема с фоновым отображением места](#version-0-14-0)
 - [0.13.0 — фон дисков и кнопка списка](#version-0-13-0)
 
@@ -21,6 +30,249 @@
 - [0.12.37 — подключение USB-накопителей](#version-0-12-37)
 - [0.12.36 — размещение на вертикальной панели](#version-0-12-36)
 - [Архив — 0.12.35 и более ранние версии](#version-archive)
+
+---
+
+<a id="version-0-17-4"></a>
+
+## 0.17.4
+
+**Дата:** 2026-10-07
+
+### Исправлено
+
+- В теме «Фон свободного места» и плитках букв добавлена лёгкая нейтральная подсветка карточки под курсором. Она располагается отдельным слоем, не меняя прозрачность постоянной заливки свободного/занятого места.
+- Подсветка плавно появляется и исчезает за 120 мс; при отключённых анимациях Windows переключается сразу. Общий фон списка остаётся прозрачным, текст и данные остаются читаемыми.
+- Меню, его пункты и настройки не изменены; схема n8n не обновляется по правилам проекта.
+
+<details>
+<summary>English</summary>
+
+### Fixed
+
+- Added a subtle neutral hover layer to Capacity background cards and letter tiles without changing the persistent capacity fill opacity.
+- The highlight fades in and out over 120 ms, or switches immediately when Windows animations are disabled. The shared list container stays transparent and content remains readable.
+- Menu items and settings are unchanged; the n8n map is not updated under the project rules.
+
+</details>
+
+---
+
+<a id="version-0-17-3"></a>
+
+## 0.17.3
+
+**Дата:** 2026-10-07
+
+### Исправлено
+
+- Карточки дисков на горизонтальной панели и кнопка «Ещё · N» используют высоту и скругление рамки «Пуска»; содержимое центрируется. Обычный и компактный вид сохраняют единый размер рамки. На вертикальной панели используется минимальная высота, чтобы не обрезать многострочные карточки.
+- Прозрачность нейтральных и цветных рамок индикатора вычисляется из полупрозрачной кисти «Пуска» с учётом её `Opacity`. Если кисть недоступна или неприменима, используется системный ресурс либо резервное значение 16/255 — около 6% непрозрачности.
+- В теме «Фон свободного места» убрано дополнительное ослабление заливки: постоянный фон использует ту же эффективную прозрачность, без усиления при наведении. Общая подсветка списка остаётся отключённой; высококонтрастные системные цвета сохраняются.
+
+<details>
+<summary>English</summary>
+
+### Fixed
+
+- Horizontal drive cards and More · N use the Start frame height and corner radius, with centered content. Normal and compact cards share the frame size. Vertical cards use a minimum height so stacked text is not clipped.
+- Neutral and capacity frames use the translucent Start brush's effective alpha, including brush opacity. When unavailable or unsuitable, use a system resource or a 16/255 fallback, about 6% opacity.
+- Capacity background no longer applies a second opacity reduction or brightens on hover. Shared list highlighting remains disabled; high-contrast system colors are retained.
+
+</details>
+
+---
+
+<a id="version-0-17-2"></a>
+
+## 0.17.2
+
+**Дата:** 2026-10-07
+
+### Исправлено
+
+- У списка дисков убрана общая подсветка контейнера: наведение или нажатие больше не выделяет весь список.
+- В теме «Цветная полоса» наведение на отдельный диск больше не заливает его фон долями свободного/занятого места. Подсвечивается только карточка под курсором, нейтральным фоном; нижняя полоса сохраняется.
+- Отдельная нейтральная подсветка работает и в системной теме, при недоступном объёме и в высококонтрастном режиме. Тема с постоянным фоном места, вариант «Только текст» и одиночный диск сохраняют своё оформление; меню и подсказки «Диски · N»/«Ещё · N» продолжают работать.
+
+<details>
+<summary>English</summary>
+
+### Fixed
+
+- Removed the shared hover/press highlight around a drive list.
+- Color bar lists now highlight only the hovered drive with a neutral background, keeping the bottom capacity strip without adding a free/used capacity fill on hover.
+- Per-drive neutral highlighting also works in the System theme, with unavailable capacity and in high contrast. Persistent Capacity background, Text only and single-drive appearance are preserved; Drives · N/More · N menus and tooltips keep working.
+
+</details>
+
+---
+
+<a id="version-0-17-1"></a>
+
+## 0.17.1
+
+**Дата:** 2026-10-07
+
+### Изменено
+
+- Подменю «Мини дизайн» переименовано в «Компактный режим», а «Авто мини дизайн» — в «Автоматически».
+- Автоматическая адаптация всегда включена: пункт отмечен галочкой и недоступен для переключения. При загрузке старое сохранённое выключение заменяется включением; остальные параметры оформления и выбор дисков сохраняются.
+- Ручные варианты компактного режима сохраняют свой приоритет. Правила размещения дисков и перехода к более компактному виду не изменены.
+
+<details>
+<summary>English</summary>
+
+### Changed
+
+- Renamed Mini design to Compact mode and Automatic mini design to Automatic.
+- Automatic adaptation is always enabled: the item is checked and disabled. Loading a previously saved disabled value migrates it to enabled; other appearance settings and drive selections are retained.
+- Manual compact options retain their priority. Drive placement and compact fallback rules remain unchanged.
+
+</details>
+
+---
+
+<a id="version-0-17-0"></a>
+
+## 0.17.0
+
+**Дата:** 2026-10-07
+
+### Добавлено
+
+- «Выбранные диски» в обоих меню: галочки позволяют составить ручной набор из локальных и внешних дисков. Отметка применяется сразу; «Показывать выбранные диски» возвращает сохранённый набор после переключения режима.
+- Ручной набор сохраняется после перезапуска Explorer. Неотмеченные новые устройства не добавляются; отключённые отмеченные буквы сохраняются отдельными строками меню и возвращаются на панель при подключении с той же буквой.
+- «Ещё · N» и «Диски · N» показывают сведения только о подключённых дисках выбранного набора. Пустой набор сообщает «Диски не выбраны», не переключаясь на все диски.
+- У новых пунктов есть русские и английские пояснения; средняя кнопка на подключённом диске открывает его в Проводнике без изменения отметки.
+
+### Изменено
+
+- «Сбросить оформление» сохраняет ручной набор; «Применить настройки Windhawk» очищает отметки вместе с параметрами меню. Переключение на одиночный диск или другую группу сохраняет набор для повторного включения.
+- Выбор хранится по буквам A–Z; строки нормализуются, повторы удаляются, произвольные пути и сетевые ресурсы не принимаются. Если букву получит другой том, набор будет показывать его.
+
+<details>
+<summary>English</summary>
+
+- Added Selected drives in both menus with checkboxes for a manual set combining internal and external drives. Each check applies immediately; Show selected drives restores the saved set after changing modes.
+- The set survives Explorer restarts. New unchecked devices are excluded. Disconnected selected letters remain listed separately and return to the taskbar when that letter reconnects.
+- More · N and Drives · N show only connected drives from the selected set. An empty set shows No drives selected instead of reverting to all drives.
+- New items have Russian and English hints; middle-click opens a connected drive in File Explorer without changing its selection.
+- Reset appearance preserves the set; Apply Windhawk settings clears its checks along with menu overrides. Choosing a single drive or another group retains the set for later reuse.
+- Store normalized, unique letters A–Z, rejecting arbitrary paths and network resources. If another volume receives a saved letter, the set displays that volume.
+
+</details>
+
+---
+
+<a id="version-0-16-0"></a>
+
+## 0.16.0
+
+**Дата:** 2026-10-07
+
+### Добавлено
+
+- Короткие штатные подсказки при наведении на все пункты меню левой и правой кнопки: группы и отдельные диски, темы и палитры, форматы, точность, мониторы, положение, мини-дизайн, пороги и системные команды. Варианты подменю также имеют пояснения; разделители исключены.
+- Пояснения доступны на русском и английском согласно языку интерфейса Windows, а также передаются средствам доступности. Подсказки дисков объясняют выбор левой кнопкой и открытие средней.
+
+### Изменено
+
+- Серые информационные строки допускают наведение без изменения настроек. В темах «Системная» и «Только текст» серое подменю цветов открывается для пояснений, но смена палитры заблокирована проверкой текущей темы.
+- Используются штатные текстовые ToolTip без собственных окон, таймеров и обработчиков наведения. Карточки «Ещё · N» и «Диски · N» сохраняют прежнее оформление.
+
+<details>
+<summary>English</summary>
+
+- Added short native hover hints to every command and option in both taskbar menus: drive groups and individual drives, appearances, palettes, capacity formats, precision, monitors, positions, mini designs, thresholds and system actions. Submenus also have hints; separators are excluded.
+- Hints follow the Windows interface language (Russian or English) and are exposed as accessibility help text. Drive hints explain left-click selection and middle-click opening.
+- Dimmed informational entries support hovering without changing settings. In System and Text only appearances, the dimmed Colors submenu can open for explanations, but palette changes are guarded by the current appearance.
+- Used native plain-text tooltips without custom windows, timers or hover handlers. Existing More · N and Drives · N cards retain their design.
+
+</details>
+
+---
+
+<a id="version-0-15-0"></a>
+
+## 0.15.0
+
+**Дата:** 2026-10-07
+
+### Добавлено
+
+- На горизонтальной панели в режиме списка отображаются только целые карточки дисков, которые помещаются в свободном участке. Место для «Ещё · N» резервируется заранее; выбранный вид и порядок по буквам сохраняются.
+- «Ещё · N» показывает количество скрытых дисков. Наведение открывает пассивную карточку с их именами и данными о месте; нажатие открывает полное меню выбора дисков. Фильтр локальных/внешних дисков сохраняется.
+
+### Изменено
+
+- Автоматическое положение выбирает сторону, вмещающую больше карточек выбранного вида. При равном количестве сохраняется предпочтение по выравниванию значков; ручной выбор стороны соблюдается.
+- В режиме списка авто мини-дизайн пробует более компактный вид только если ни одна карточка выбранного вида не помещается. Если карточки не помещаются, остаётся «Диски · N»; ручной режим счётчика сохранён.
+- Количество пересчитывается при проверках панели не реже раза в пять секунд. Для возврата карточки нужны восемь свободных единиц XAML сверх её ширины; сокращение не откладывается. Диагностика сообщает видимое/скрытое количество и итоговую ширину.
+- Полный снимок показаний сохраняется: скрытые диски доступны через меню и подсказку. Одиночный режим и вертикальный список с прокруткой сохраняют прежнее поведение. Подсказки остаются пассивными, содержимое открытой карточки не заменяется.
+
+<details>
+<summary>English</summary>
+
+- Horizontal list mode shows the largest fitting prefix of whole drive cards, reserving More · N before choosing the count. The selected design and drive-letter order are preserved.
+- More · N reports the hidden count. Hover displays a passive card containing hidden-drive names and capacity readings; left-click opens the complete drive menu. Local/external group filtering is retained.
+- Automatic position chooses the side fitting more cards in the selected design; ties keep the preference associated with taskbar icon alignment. Manual side selection is respected.
+- In list mode, automatic mini design compacts further only if no selected-design card fits. Drives · N remains the final fallback and an explicit manual mode.
+- Recompute on taskbar probes at least every five seconds. Restoring a card needs eight extra logical pixels of headroom; shrinking is not delayed. Diagnostics include visible/hidden counts and final width.
+- Retain the full reading snapshot for menus and tooltips. Single-drive and vertically scrolling list behavior is unchanged. Tooltips remain passive and their open content is not replaced.
+
+</details>
+
+---
+
+<a id="version-0-14-2"></a>
+
+## 0.14.2
+
+**Дата:** 2026-10-06
+
+### Исправлено
+
+- После сообщения о падении Explorer при повторном наведении карточка переведена в пассивный режим: интерактивный ScrollViewer удалён, перехват мыши отключён. Дампы подтверждают исключение XAML с HRESULT 0x80070057; точный внутренний вызов не восстановлен, повторные наведения требуется проверить в Explorer.
+- Подсказка явно привязана к XamlRoot и элементу своей панели. Содержимое обновляется только при закрытой карточке, а положение меняется только при необходимости; полностью настроенная карточка присоединяется к кнопке после создания содержимого.
+
+### Изменено
+
+- Большие списки размещаются в колонках без прокрутки, в пределах рабочей области монитора и текущего DPI. При нехватке места показывается число оставшихся дисков. Имена и объёмы ограничены двумя строками; счётчик, палитра и шкалы сохранены.
+
+<details>
+<summary>English</summary>
+
+- Addressed reported repeated-hover Explorer crashes by making the card passive: removed its interactive ScrollViewer and disabled mouse hit testing. Dumps show a XAML exception with HRESULT 0x80070057; the exact internal call could not be recovered, so repeated-hover testing in Explorer is still required.
+- Explicitly associated the tooltip with its owner's XamlRoot and placement target. Content refreshes only while closed, placement changes only when needed, and the configured tooltip attaches after its content is created.
+- Long lists use columns instead of scrolling, bounded by the monitor work area and DPI. Any remaining drive count is shown when space runs out. Names and capacity wrap to at most two lines; count, palette and capacity bars are preserved.
+
+</details>
+
+---
+
+<a id="version-0-14-1"></a>
+
+## 0.14.1
+
+**Дата:** 2026-10-06
+
+### Изменено
+
+- Текстовая подсказка «Диски · N» заменена скруглённой карточкой: заголовок выбранной группы, счётчик дисков, отдельные блоки с буквой, именем, объёмом, процентом свободного места и цветовой шкалой свободно/занято.
+- Сохранены выбранные формат и точность. Палитра и предупреждения о нехватке места применяются к карточке; светлая, тёмная и высококонтрастная темы Windows учитываются.
+- Длинные имена переносятся до двух строк; большой список прокручивается, высота ограничена рабочей областью монитора с учётом DPI. Карточка открывается со стороны рабочего стола для всех положений панели.
+- Карточка использует готовые показания выбранной группы без дополнительных обращений к дискам; при выходе из режима списка и отключении мода подсказка закрывается и отсоединяется.
+
+<details>
+<summary>English</summary>
+
+- Redesigned the Drives · N tooltip as a rounded card with a group heading, drive count and individual drive panels containing the letter, name, capacity, free-space percentage and a free/used bar.
+- Preserved the selected capacity format and precision; applied the palette and low-space warnings, with light, dark and high-contrast colors.
+- Long names wrap to two lines. Long lists scroll within a DPI-aware monitor work-area limit; placement faces the desktop on each taskbar edge.
+- Reused the selected group's cached readings without extra disk queries. The tooltip closes and detaches when leaving list-button mode or disabling the mod.
+
+</details>
 
 ---
 
